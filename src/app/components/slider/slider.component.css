@@ -29,7 +29,9 @@
   display: inline-block;
   width: 394px;
   height: 150px;
-  background: yellowgreen;
+  background: pink;
+  font-size: 26px;
+  font-weight: 600;
   position: relative;
   margin: 0 12px;
 }

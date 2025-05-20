@@ -50,8 +50,8 @@ export class SliderComponent implements OnInit {
       { id: 4, name: 'item4' },
       { id: 5, name: 'item5' },
       { id: 6, name: 'item6' },
-      { id: 7, name: 'item7' },
-      { id: 8, name: 'item8' },
+      // { id: 7, name: 'item7' },
+      // { id: 8, name: 'item8' },
     ]
   }
 
@@ -62,7 +62,8 @@ export class SliderComponent implements OnInit {
   visibleItems: any[] = [];
   currentIndex = 0;
   stepSize: number = this.sliderOptions.stepSize;
-  indicatorsLength: number = Math.ceil(this.sliderOptions.sliderItems.length / this.sliderOptions.numberOfVisibleItems)
+ // indicatorsLength: number = Math.ceil(this.sliderOptions.sliderItems.length / this.sliderOptions.numberOfVisibleItems)
+  indicatorsLength: number = Math.ceil(this.sliderOptions.sliderItems.length/this.stepSize);
   autoplayInterval: any;
   resizeTimeout: any;
   get indicatorsArray(): number[] {
@@ -91,7 +92,6 @@ export class SliderComponent implements OnInit {
   onWindowResize = () => {
     // this.applyResponsiveOptions();
     // this.calculateVisibleItems();
-
     clearTimeout(this.resizeTimeout);
     this.resizeTimeout = setTimeout(() => {
       this.applyResponsiveOptions();
@@ -102,6 +102,9 @@ export class SliderComponent implements OnInit {
 
   calculateVisibleItems() {
     this.visibleItems = this.sliderOptions.sliderItems.slice(this.currentIndex, this.currentIndex + this.sliderOptions.numberOfVisibleItems);
+    if(this.sliderOptions.infiniteScroll){
+      this.visibleItems = [...this.visibleItems, ...this.sliderOptions.sliderItems.slice(0, this.sliderOptions.numberOfVisibleItems)];
+    }
   }
 
   nextFunc() {
@@ -141,19 +144,18 @@ export class SliderComponent implements OnInit {
 
   // slide using indicators
   goToSlide(index: number): void {
+    console.log(index)
     this.currentIndex = index * this.sliderOptions.numberOfVisibleItems;
     this.calculateVisibleItems();
-
   }
+
   applyResponsiveOptions(): void {
     const width = window.innerWidth;
-
     for (let config of this.responsiveOptions) {
       const breakpoint = parseInt(config.breakpoint.replace('px', ''), 10);
       if (width <= breakpoint) {
         this.sliderOptions.numberOfVisibleItems = config.numVisible;
         this.stepSize = config.numScroll;
-        // You can also store numScroll if needed
         break;
       }
     }
