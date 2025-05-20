@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core';
 import { ResponsiveConfig, SliderOptions } from './interfaces/sliderTypes';
 
 @Component({
@@ -9,6 +9,7 @@ import { ResponsiveConfig, SliderOptions } from './interfaces/sliderTypes';
   styleUrl: './slider.component.css'
 })
 export class SliderComponent implements OnInit {
+  constructor(private cdr: ChangeDetectorRef) { }
   @ViewChild('sliderWrapper', { static: true }) sliderMain!: ElementRef;
   @Input() responsiveOptions: ResponsiveConfig[] = [
     {
@@ -35,7 +36,8 @@ export class SliderComponent implements OnInit {
 
   @Input() sliderOptions: SliderOptions = {
     navButtons: true,
-    autoScroll: true,
+    autoplay: true,
+    autoplaySpeed: 3000,
     indicators: true,
     infiniteScroll: true,
     isDraggable: true,
@@ -49,7 +51,7 @@ export class SliderComponent implements OnInit {
       { id: 5, name: 'item5' },
       { id: 6, name: 'item6' },
       { id: 7, name: 'item7' },
-      { id: 8, name: 'item8' }
+      { id: 8, name: 'item8' },
     ]
   }
 
@@ -61,7 +63,8 @@ export class SliderComponent implements OnInit {
   currentIndex = 0;
   stepSize: number = this.sliderOptions.stepSize;
   indicatorsLength: number = Math.ceil(this.sliderOptions.sliderItems.length / this.sliderOptions.numberOfVisibleItems)
-
+  autoplayInterval: any;
+  resizeTimeout: any;
   get indicatorsArray(): number[] {
     return Array.from({ length: this.indicatorsLength }, (_, i) => i);
   }
@@ -80,11 +83,21 @@ export class SliderComponent implements OnInit {
   ngOnInit(): void {
     this.calculateVisibleItems()
     window.addEventListener('resize', this.onWindowResize.bind(this));
+    if (this.sliderOptions.autoplay) {
+      this.startAutoplay();
+    }
   }
 
   onWindowResize = () => {
-    this.updateResponsiveSettings();
-    this.calculateVisibleItems();
+    // this.applyResponsiveOptions();
+    // this.calculateVisibleItems();
+
+    clearTimeout(this.resizeTimeout);
+    this.resizeTimeout = setTimeout(() => {
+      this.applyResponsiveOptions();
+      this.calculateVisibleItems();
+      this.cdr.detectChanges();
+    }, 0);
   }
 
   calculateVisibleItems() {
@@ -126,12 +139,13 @@ export class SliderComponent implements OnInit {
 
   }
 
+  // slide using indicators
   goToSlide(index: number): void {
     this.currentIndex = index * this.sliderOptions.numberOfVisibleItems;
     this.calculateVisibleItems();
 
   }
-  updateResponsiveSettings(): void {
+  applyResponsiveOptions(): void {
     const width = window.innerWidth;
 
     for (let config of this.responsiveOptions) {
@@ -145,11 +159,31 @@ export class SliderComponent implements OnInit {
     }
   }
 
+  //handle scroll by dragging
   @HostListener('document:mouseup', ['$event'])
   onmouseup(event: MouseEvent) {
     this.isDragging = false;
   }
 
+  //handle autoplay
+  startAutoplay(): void {
+    if (this.sliderOptions.autoplay) {
+      this.autoplayInterval = setInterval(() => {
+        this.nextFunc();
+      }, this.sliderOptions.autoplaySpeed || 3000); //default 3s
+    }
+  }
 
+  stopAutoplay(): void {
+    if (this.autoplayInterval && this.sliderOptions.autoplay) {
+      clearInterval(this.autoplayInterval);
+    }
+  }
+
+
+  onDestroy() {
+    this.stopAutoplay();
+    window.removeEventListener('resize', this.onWindowResize);
+  }
 
 }

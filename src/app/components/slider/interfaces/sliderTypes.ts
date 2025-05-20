@@ -10,7 +10,8 @@ export interface SliderItems {
 }
 export interface SliderOptions {
   navButtons: boolean;
-  autoScroll: boolean;
+  autoplay?: boolean;
+  autoplaySpeed?:number;
   indicators: boolean;
   infiniteScroll: boolean;
   isDraggable:boolean;
