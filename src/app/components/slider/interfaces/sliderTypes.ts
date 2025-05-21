@@ -5,17 +5,15 @@ export interface ResponsiveConfig {
 }
 
 
-export interface SliderItems {
 
-}
 export interface SliderOptions {
-  navButtons: boolean;
+  navButtons?: boolean;
   autoplay?: boolean;
   autoplaySpeed?:number;
-  indicators: boolean;
-  infiniteScroll: boolean;
-  isDraggable:boolean;
-  stepSize:number;
+  indicators?: boolean;
+  infiniteScroll?: boolean;
+  isDraggable?:boolean;
+  stepSize?:number;
   numberOfVisibleItems:number;
-  sliderItems: any[];
+
 }

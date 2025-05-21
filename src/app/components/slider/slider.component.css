@@ -23,6 +23,10 @@
 .slider-main {
   position: absolute;
   width: 200%;
+
+  /* display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-start; */
 }
 
 .slider-item {

@@ -1,29 +1,23 @@
 <section class="slider">
   <div class="container-fluid">
-    <div class="slider-wrap"  (mouseenter)="stopAutoplay()"  (mouseleave)="startAutoplay()">
+    <div class="slider-wrap" (mouseenter)="stopAutoplay()" (mouseleave)="startAutoplay()">
       <div class="slider-main" #sliderWrapper>
-        @for (item of visibleItems; track item) {
-          <div class="slider-item">
-            <div class="text">{{ item.id }}</div>
-          </div>
+        @for (item of visibleItems; track item.id;) {
+        <ng-container *ngTemplateOutlet="itemTemplate; context: {$implicit: item} "></ng-container>
         }
       </div>
-
+      <!-- Navigation Buttons -->
       <div class="button-area" *ngIf="sliderOptions.navButtons">
         <div class="prev" (click)="prevFunc()"><i class="bi bi-arrow-left-circle"></i></div>
         <div class="next" (click)="nextFunc()"><i class="bi bi-arrow-right-circle"></i></div>
       </div>
-
-
     </div>
-     <div class="slider-indicators " *ngIf="sliderOptions.indicators">
-        @for (item of indicatorsArray; track item; let i = $index) {
-          <div
-            class="indicator"
-            [class.active]="currentIndex === i"
-            (click)="goToSlide(i)">
-          </div>
-        }
+    <!-- Indicators -->
+    <div class="slider-indicators" *ngIf="sliderOptions.indicators">
+      @for (item of indicatorsArray; track item; let i = $index) {
+      <div class="indicator" [class.active]="currentIndex === i" (click)="goToSlide(i)">
       </div>
+      }
     </div>
+  </div>
 </section>

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ContentChild, ElementRef, HostListener, Input, OnInit, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { ResponsiveConfig, SliderOptions } from './interfaces/sliderTypes';
 
 @Component({
@@ -10,16 +10,12 @@ import { ResponsiveConfig, SliderOptions } from './interfaces/sliderTypes';
 })
 export class SliderComponent implements OnInit {
   constructor(private cdr: ChangeDetectorRef) { }
+  @ContentChild('itemTemplate') itemTemplate!: TemplateRef<any>;
   @ViewChild('sliderWrapper', { static: true }) sliderMain!: ElementRef;
   @Input() responsiveOptions: ResponsiveConfig[] = [
     {
-      breakpoint: '1400px',
-      numVisible: 4,
-      numScroll: 1
-    },
-    {
-      breakpoint: '1199px',
-      numVisible: 4,
+      breakpoint: '575px',
+      numVisible: 1,
       numScroll: 1
     },
     {
@@ -28,8 +24,13 @@ export class SliderComponent implements OnInit {
       numScroll: 1
     },
     {
-      breakpoint: '575px',
-      numVisible: 1,
+      breakpoint: '1199px',
+      numVisible: 4,
+      numScroll: 1
+    },
+    {
+      breakpoint: '1400px',
+      numVisible: 4,
       numScroll: 1
     }
   ];
@@ -43,55 +44,55 @@ export class SliderComponent implements OnInit {
     isDraggable: true,
     numberOfVisibleItems: 4,
     stepSize: 1,
-    sliderItems: [
-      { id: 1, name: 'item1' },
-      { id: 2, name: 'item2' },
-      { id: 3, name: 'item3' },
-      { id: 4, name: 'item4' },
-      { id: 5, name: 'item5' },
-      { id: 6, name: 'item6' },
-      // { id: 7, name: 'item7' },
-      // { id: 8, name: 'item8' },
-    ]
   }
 
-
+  @Input() sliderItems: any[] = [];
   isDragging: boolean = false;
   startX = 0;
   scrollStart = 0;
   visibleItems: any[] = [];
   currentIndex = 0;
-  stepSize: number = this.sliderOptions.stepSize;
- // indicatorsLength: number = Math.ceil(this.sliderOptions.sliderItems.length / this.sliderOptions.numberOfVisibleItems)
-  indicatorsLength: number = Math.ceil(this.sliderOptions.sliderItems.length/this.stepSize);
   autoplayInterval: any;
   resizeTimeout: any;
-  get indicatorsArray(): number[] {
-    return Array.from({ length: this.indicatorsLength }, (_, i) => i);
-  }
+  stepSize: number = 0;
+  indicatorsLength: number = 0;
+  indicatorsArray: any[] = [];
+  sortedResponsiveOptons: any;
+  largestBreakpoint: any;
 
-  // items = [
-  //   { id: 1, name: 'item1' },
-  //   { id: 2, name: 'item2' },
-  //   { id: 3, name: 'item3' },
-  //   { id: 4, name: 'item4' },
-  //   { id: 5, name: 'item5' },
-  //   { id: 6, name: 'item6' },
-  //   { id: 7, name: 'item7' },
-  //   { id: 8, name: 'item8' }
-  // ]
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['sliderItems'] || changes['sliderOptions']) {
+      this.calculateVisibleItems();
+      this.stepSize = this.sliderOptions.stepSize || 1;
+      this.indicatorsLength = Math.ceil(this.sliderItems.length / this.sliderOptions.numberOfVisibleItems);
+      this.indicatorsArray = Array.from({ length: this.indicatorsLength }, (_, i) => i);
+      if (this.sliderOptions.autoplay) {
+        this.startAutoplay();
+      }
+    }
+    if (changes['responsiveOptions']) {
+      this.applyResponsiveOptions();
+      this.calculateVisibleItems();
+      this.sortedResponsiveOptons = this.responsiveOptions.sort((a: any, b: any) => parseInt(a.breakpoint.replace('px', ''), 10) - parseInt(b.breakpoint.replace('px', ''), 10));
+      this.largestBreakpoint = this.sortedResponsiveOptons.pop();
+    }
+  }
 
   ngOnInit(): void {
     this.calculateVisibleItems()
     window.addEventListener('resize', this.onWindowResize.bind(this));
+    // this.applyResponsiveOptions()
     if (this.sliderOptions.autoplay) {
       this.startAutoplay();
     }
+
+    this.sortedResponsiveOptons = this.responsiveOptions.sort((a: any, b: any) => parseInt(a.breakpoint.replace('px', ''), 10) - parseInt(b.breakpoint.replace('px', ''), 10));
+    this.largestBreakpoint = this.sortedResponsiveOptons.pop();
+
   }
 
   onWindowResize = () => {
-    // this.applyResponsiveOptions();
-    // this.calculateVisibleItems();
     clearTimeout(this.resizeTimeout);
     this.resizeTimeout = setTimeout(() => {
       this.applyResponsiveOptions();
@@ -101,9 +102,9 @@ export class SliderComponent implements OnInit {
   }
 
   calculateVisibleItems() {
-    this.visibleItems = this.sliderOptions.sliderItems.slice(this.currentIndex, this.currentIndex + this.sliderOptions.numberOfVisibleItems);
-    if(this.sliderOptions.infiniteScroll){
-      this.visibleItems = [...this.visibleItems, ...this.sliderOptions.sliderItems.slice(0, this.sliderOptions.numberOfVisibleItems)];
+    this.visibleItems = this.sliderItems.slice(this.currentIndex, this.currentIndex + (this.sliderOptions.numberOfVisibleItems));
+    if (this.sliderOptions.infiniteScroll) {
+      this.visibleItems = [...this.visibleItems, ...this.sliderItems.slice(0, this.sliderOptions.numberOfVisibleItems)];
     }
   }
 
@@ -111,12 +112,12 @@ export class SliderComponent implements OnInit {
     const step = this.stepSize;
     if (this.sliderOptions.infiniteScroll) {
       this.currentIndex += step;
-      if (this.currentIndex >= this.sliderOptions.sliderItems.length) {
+      if (this.currentIndex >= this.sliderItems.length) {
         this.currentIndex = 0;
       }
       this.calculateVisibleItems();
     } else {
-      if (this.currentIndex + this.sliderOptions.numberOfVisibleItems < this.sliderOptions.sliderItems.length) {
+      if (this.currentIndex + this.sliderOptions.numberOfVisibleItems < this.sliderItems.length) {
         this.currentIndex += step;
         this.calculateVisibleItems();
       }
@@ -129,7 +130,7 @@ export class SliderComponent implements OnInit {
     if (this.sliderOptions.infiniteScroll) {
       this.currentIndex -= step;
       if (this.currentIndex < 0) {
-        const totalItems = this.sliderOptions.sliderItems.length;
+        const totalItems = this.sliderItems.length;
         this.currentIndex = totalItems - (totalItems % step || step);
       }
       this.calculateVisibleItems();
@@ -144,21 +145,36 @@ export class SliderComponent implements OnInit {
 
   // slide using indicators
   goToSlide(index: number): void {
-    console.log(index)
     this.currentIndex = index * this.sliderOptions.numberOfVisibleItems;
     this.calculateVisibleItems();
+    // const indicatorEl = e.target as HTMLElement
+    // indicatorEl.classList.add('.active')
   }
 
   applyResponsiveOptions(): void {
     const width = window.innerWidth;
-    for (let config of this.responsiveOptions) {
+    for (let config of this.sortedResponsiveOptons) {
       const breakpoint = parseInt(config.breakpoint.replace('px', ''), 10);
       if (width <= breakpoint) {
-        this.sliderOptions.numberOfVisibleItems = config.numVisible;
+        this.sliderOptions = {
+          ...this.sliderOptions,
+          numberOfVisibleItems: config.numVisible
+        }
         this.stepSize = config.numScroll;
+        this.indicatorsLength = Math.ceil(this.sliderItems.length / this.sliderOptions.numberOfVisibleItems);
+        this.indicatorsArray = Array.from({ length: this.indicatorsLength }, (_, i) => i);
         break;
+      } else {
+        this.sliderOptions = {
+          ...this.sliderOptions,
+          numberOfVisibleItems: this.largestBreakpoint?.numVisible || this.sliderOptions.numberOfVisibleItems
+        }
+        this.stepSize = this.largestBreakpoint?.numScroll || 1;
+        this.indicatorsLength = Math.ceil(this.sliderItems.length / this.sliderOptions.numberOfVisibleItems);
+        this.indicatorsArray = Array.from({ length: this.indicatorsLength }, (_, i) => i);
       }
     }
+    this.cdr.detectChanges();
   }
 
   //handle scroll by dragging
