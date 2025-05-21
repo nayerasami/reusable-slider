@@ -2,7 +2,7 @@
   <div class="container-fluid">
     <div class="slider-wrap" (mouseenter)="stopAutoplay()" (mouseleave)="startAutoplay()">
       <div class="slider-main" #sliderWrapper>
-        @for (item of visibleItems; track item.id;) {
+        @for (item of visibleItems; track item;) {
         <ng-container *ngTemplateOutlet="itemTemplate; context: {$implicit: item} "></ng-container>
         }
       </div>
