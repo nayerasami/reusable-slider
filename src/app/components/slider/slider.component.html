@@ -3,7 +3,9 @@
     <div class="slider-wrap" (mouseenter)="stopAutoplay()" (mouseleave)="startAutoplay()">
       <div class="slider-main" #sliderWrapper>
         @for (item of visibleItems; track item;) {
+           <div class="slider-item"  [ngStyle]="{ width: 'calc(' + (100 / sliderOptions.numberOfVisibleItems) + '% - 24px)',}">
         <ng-container *ngTemplateOutlet="itemTemplate; context: {$implicit: item} "></ng-container>
+        </div>
         }
       </div>
       <!-- Navigation Buttons -->

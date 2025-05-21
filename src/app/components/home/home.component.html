@@ -1,8 +1,6 @@
-<app-slider [sliderOptions]="sliderOptions"  [sliderItems]="sliderItems">
-<ng-template #itemTemplate let-item>
-  <div class="slider-item">
+<app-slider [sliderOptions]="sliderOptions" [sliderItems]="sliderItems">
+  <ng-template #itemTemplate let-item>
     <div class="text">{{ item.id }}</div>
-  </div>
   </ng-template>
 
 </app-slider>
