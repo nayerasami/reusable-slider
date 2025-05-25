@@ -15,5 +15,7 @@ export interface SliderOptions {
   isDraggable?:boolean;
   stepSize?:number;
   numberOfVisibleItems:number;
+  spaceBetween?:number;
+  rtl?:boolean
 
 }

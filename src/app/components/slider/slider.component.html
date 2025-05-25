@@ -2,9 +2,9 @@
   <div class="container-fluid">
     <div class="slider-wrap" (mouseenter)="stopAutoplay()" (mouseleave)="startAutoplay()">
       <div class="slider-main" #sliderWrapper>
-        @for (item of visibleItems; track item;) {
-           <div class="slider-item"  [ngStyle]="{ width: 'calc(' + (100 / sliderOptions.numberOfVisibleItems) + '% - 24px)',}">
-        <ng-container *ngTemplateOutlet="itemTemplate; context: {$implicit: item} "></ng-container>
+        @for (item of visibleItems; track trackItemFun(item, $index);) {
+        <div class="slider-item" [ngStyle]="{  width: 'calc(' + (100 / sliderOptions.numberOfVisibleItems) + '% - ' + sliderOptions.spaceBetween + 'px)', margin: sliderOptions.numberOfVisibleItems > 1 ? '0 ' + (sliderOptions.spaceBetween) + 'px' : '0' }">
+          <ng-container *ngTemplateOutlet="itemTemplate; context: {$implicit: item} "></ng-container>
         </div>
         }
       </div>

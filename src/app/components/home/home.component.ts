@@ -38,10 +38,11 @@ export class HomeComponent {
     autoplay: false,
     autoplaySpeed: 3000,
     indicators: true,
-    infiniteScroll: true,
+    infiniteScroll: false,
     isDraggable: true,
-    numberOfVisibleItems: 4,
-    stepSize: 1,
+    numberOfVisibleItems: 3.5,
+    stepSize: 3,
+    spaceBetween:12
   }
 
   sliderItems = [
@@ -51,8 +52,8 @@ export class HomeComponent {
     { id: 4, name: 'item4' },
     { id: 5, name: 'item5' },
     { id: 6, name: 'item6' },
-    // { id: 7, name: 'item7' },
-    // { id: 8, name: 'item8' },
+    { id: 7, name: 'item7' },
+    { id: 8, name: 'item8' },
   ]
 
 

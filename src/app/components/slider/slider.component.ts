@@ -80,15 +80,19 @@ export class SliderComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.calculateVisibleItems()
     window.addEventListener('resize', this.onWindowResize.bind(this));
     // this.applyResponsiveOptions()
     if (this.sliderOptions.autoplay) {
       this.startAutoplay();
     }
 
-    this.sortedResponsiveOptons = this.responsiveOptions.sort((a: any, b: any) => parseInt(a.breakpoint.replace('px', ''), 10) - parseInt(b.breakpoint.replace('px', ''), 10));
-    this.largestBreakpoint = this.sortedResponsiveOptons.pop();
+    if (this.responsiveOptions.length) {
+      this.sortedResponsiveOptons = this.responsiveOptions.sort((a: any, b: any) => parseInt(a.breakpoint.replace('px', ''), 10) - parseInt(b.breakpoint.replace('px', ''), 10));
+      this.largestBreakpoint = this.sortedResponsiveOptons.pop();
+      this.applyResponsiveOptions();
+      this.calculateVisibleItems()
+
+    }
 
   }
 
@@ -101,8 +105,11 @@ export class SliderComponent implements OnInit {
     }, 0);
   }
 
+  trackItemFun(item :any ,index:any){
+    return index
+  }
   calculateVisibleItems() {
-    this.visibleItems = this.sliderItems.slice(this.currentIndex, this.currentIndex + (this.sliderOptions.numberOfVisibleItems));
+   this.visibleItems = this.sliderItems.slice(this.currentIndex, this.currentIndex + (this.sliderOptions.numberOfVisibleItems));
     if (this.sliderOptions.infiniteScroll) {
       this.visibleItems = [...this.visibleItems, ...this.sliderItems.slice(0, this.sliderOptions.numberOfVisibleItems)];
     }
