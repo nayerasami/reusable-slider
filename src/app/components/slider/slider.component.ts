@@ -12,29 +12,7 @@ export class SliderComponent implements OnInit {
   constructor(private cdr: ChangeDetectorRef) { }
   @ContentChild('itemTemplate') itemTemplate!: TemplateRef<any>;
   @ViewChild('sliderWrapper', { static: true }) sliderMain!: ElementRef;
-  @Input() responsiveOptions: ResponsiveConfig[] = [
-    {
-      breakpoint: '575px',
-      numVisible: 1,
-      numScroll: 1
-    },
-    {
-      breakpoint: '767px',
-      numVisible: 2,
-      numScroll: 1
-    },
-    {
-      breakpoint: '1199px',
-      numVisible: 4,
-      numScroll: 1
-    },
-    {
-      breakpoint: '1400px',
-      numVisible: 4,
-      numScroll: 1
-    }
-  ];
-
+  @Input() responsiveOptions:any;
   @Input() sliderOptions: SliderOptions = {
     navButtons: true,
     autoplay: true,
@@ -43,7 +21,6 @@ export class SliderComponent implements OnInit {
     infiniteScroll: true,
     isDraggable: true,
     numberOfVisibleItems: 4,
-    stepSize: 1,
   }
 
   @Input() sliderItems: any[] = [];
@@ -59,11 +36,11 @@ export class SliderComponent implements OnInit {
   indicatorsArray: any[] = [];
   sortedResponsiveOptons: any;
   largestBreakpoint: any;
-
-
+  translateX: number = 0;
+  isRTL:boolean=false;
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['sliderItems'] || changes['sliderOptions']) {
-      this.calculateVisibleItems();
+      this.calculateSliderPosition();
       this.stepSize = this.sliderOptions.stepSize || 1;
       this.indicatorsLength = Math.ceil(this.sliderItems.length / this.sliderOptions.numberOfVisibleItems);
       this.indicatorsArray = Array.from({ length: this.indicatorsLength }, (_, i) => i);
@@ -73,7 +50,7 @@ export class SliderComponent implements OnInit {
     }
     if (changes['responsiveOptions']) {
       this.applyResponsiveOptions();
-      this.calculateVisibleItems();
+      this.calculateSliderPosition();
       this.sortedResponsiveOptons = this.responsiveOptions.sort((a: any, b: any) => parseInt(a.breakpoint.replace('px', ''), 10) - parseInt(b.breakpoint.replace('px', ''), 10));
       this.largestBreakpoint = this.sortedResponsiveOptons.pop();
     }
@@ -90,8 +67,7 @@ export class SliderComponent implements OnInit {
       this.sortedResponsiveOptons = this.responsiveOptions.sort((a: any, b: any) => parseInt(a.breakpoint.replace('px', ''), 10) - parseInt(b.breakpoint.replace('px', ''), 10));
       this.largestBreakpoint = this.sortedResponsiveOptons.pop();
       this.applyResponsiveOptions();
-      this.calculateVisibleItems()
-
+      this.calculateSliderPosition();
     }
 
   }
@@ -100,35 +76,40 @@ export class SliderComponent implements OnInit {
     clearTimeout(this.resizeTimeout);
     this.resizeTimeout = setTimeout(() => {
       this.applyResponsiveOptions();
-      this.calculateVisibleItems();
-      this.cdr.detectChanges();
+      this.calculateSliderPosition(); this.cdr.detectChanges();
     }, 0);
   }
 
-  trackItemFun(item :any ,index:any){
+  trackItemFun(item: any, index: any) {
     return index
   }
-  calculateVisibleItems() {
-   this.visibleItems = this.sliderItems.slice(this.currentIndex, this.currentIndex + (this.sliderOptions.numberOfVisibleItems));
-    if (this.sliderOptions.infiniteScroll) {
-      this.visibleItems = [...this.visibleItems, ...this.sliderItems.slice(0, this.sliderOptions.numberOfVisibleItems)];
-    }
+
+  calculateSliderPosition() {
+    // Calculate the width of each item including space between
+    const itemWidth = 100 / this.sliderOptions.numberOfVisibleItems;
+    // Calculate translate position based on current index
+
+      this.translateX = -(this.currentIndex * itemWidth);
+
   }
+
 
   nextFunc() {
     const step = this.stepSize;
+    const maxIndex = this.sliderItems.length - this.sliderOptions.numberOfVisibleItems;
     if (this.sliderOptions.infiniteScroll) {
       this.currentIndex += step;
-      if (this.currentIndex >= this.sliderItems.length) {
-        this.currentIndex = 0;
+      if (this.currentIndex == this.sliderItems.length) {
+        this.currentIndex=0
+        console.log(this.currentIndex, 'current indexx')
+        console.log('translate XX', this.translateX);
       }
-      this.calculateVisibleItems();
     } else {
-      if (this.currentIndex + this.sliderOptions.numberOfVisibleItems < this.sliderItems.length) {
+      if (this.currentIndex + step <= maxIndex) {
         this.currentIndex += step;
-        this.calculateVisibleItems();
       }
     }
+    this.calculateSliderPosition();
 
   }
 
@@ -140,24 +121,65 @@ export class SliderComponent implements OnInit {
         const totalItems = this.sliderItems.length;
         this.currentIndex = totalItems - (totalItems % step || step);
       }
-      this.calculateVisibleItems();
     } else {
       if (this.currentIndex - step >= 0) {
         this.currentIndex -= step;
-        this.calculateVisibleItems();
       }
     }
 
+    this.calculateSliderPosition();
   }
+
+  // calculateVisibleItems() {
+  //  this.visibleItems = this.sliderItems.slice(this.currentIndex, this.currentIndex + (this.sliderOptions.numberOfVisibleItems));
+  //   if (this.sliderOptions.infiniteScroll) {
+  //     this.visibleItems = [...this.visibleItems, ...this.sliderItems.slice(0, this.sliderOptions.numberOfVisibleItems)];
+  //   }
+  // }
+
+  // nextFunc() {
+  //   const step = this.stepSize;
+  //   if (this.sliderOptions.infiniteScroll) {
+  //     this.currentIndex += step;
+  //     if (this.currentIndex >= this.sliderItems.length) {
+  //       this.currentIndex = 0;
+  //     }
+  //     this.calculateVisibleItems();
+  //   } else {
+  //     if (this.currentIndex + this.sliderOptions.numberOfVisibleItems < this.sliderItems.length) {
+  //       this.currentIndex += step;
+  //       this.calculateVisibleItems();
+  //     }
+  //   }
+
+  // }
+
+  // prevFunc() {
+  //   const step = this.stepSize;
+  //   if (this.sliderOptions.infiniteScroll) {
+  //     this.currentIndex -= step;
+  //     if (this.currentIndex < 0) {
+  //       const totalItems = this.sliderItems.length;
+  //       this.currentIndex = totalItems - (totalItems % step || step);
+  //     }
+  //     this.calculateVisibleItems();
+  //   } else {
+  //     if (this.currentIndex - step >= 0) {
+  //       this.currentIndex -= step;
+  //       this.calculateVisibleItems();
+  //     }
+  //   }
+
+  // }
 
   // slide using indicators
   goToSlide(index: number): void {
     this.currentIndex = index * this.sliderOptions.numberOfVisibleItems;
-    this.calculateVisibleItems();
+    this.calculateSliderPosition();
     // const indicatorEl = e.target as HTMLElement
     // indicatorEl.classList.add('.active')
   }
-  
+
   applyResponsiveOptions(): void {
     const width = window.innerWidth;
     for (let config of this.sortedResponsiveOptons) {

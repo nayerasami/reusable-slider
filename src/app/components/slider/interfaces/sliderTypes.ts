@@ -16,6 +16,9 @@ export interface SliderOptions {
   stepSize?:number;
   numberOfVisibleItems:number;
   spaceBetween?:number;
-  rtl?:boolean
+  rtl?:boolean,
+  animation?:'linear' | 'ease-in-out' | 'ease-out' | 'ease-in' | 'ease',
+  nextButton?:string,
+  prevButton?:string
 
 }

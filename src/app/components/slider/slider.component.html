@@ -1,18 +1,40 @@
-<section class="slider">
+<section class="slider" >
   <div class="container-fluid">
     <div class="slider-wrap" (mouseenter)="stopAutoplay()" (mouseleave)="startAutoplay()">
-      <div class="slider-main" #sliderWrapper>
-        @for (item of visibleItems; track trackItemFun(item, $index);) {
-        <div class="slider-item" [ngStyle]="{  width: 'calc(' + (100 / sliderOptions.numberOfVisibleItems) + '% - ' + sliderOptions.spaceBetween + 'px)', margin: sliderOptions.numberOfVisibleItems > 1 ? '0 ' + (sliderOptions.spaceBetween) + 'px' : '0' }">
+      <div class="slider-main" #sliderWrapper [ngStyle]="{
+                 transform: 'translateX(' + translateX + '%)',
+                 transition: 'transform 0.3s ' + (sliderOptions.animation ? sliderOptions.animation : 'linear')
+             }">
+        @for (item of sliderItems; track trackItemFun(item, $index);) {
+        <div class="slider-item"
+          [ngStyle]="{  width: 'calc(' + (100 / sliderOptions.numberOfVisibleItems) + '% - ' + (sliderOptions.numberOfVisibleItems > 1 ? sliderOptions.spaceBetween : 0) + 'px)', margin: sliderOptions.numberOfVisibleItems > 1 ? '0 ' + (sliderOptions.spaceBetween) + 'px' : '0' }">
           <ng-container *ngTemplateOutlet="itemTemplate; context: {$implicit: item} "></ng-container>
         </div>
         }
       </div>
       <!-- Navigation Buttons -->
-      <div class="button-area" *ngIf="sliderOptions.navButtons">
-        <div class="prev" (click)="prevFunc()"><i class="bi bi-arrow-left-circle"></i></div>
-        <div class="next" (click)="nextFunc()"><i class="bi bi-arrow-right-circle"></i></div>
-      </div>
+
+      <ng-container *ngIf="sliderOptions.navButtons; else customButtons">
+        <div class="button-area">
+          <div class="prev" (click)="prevFunc()"><i class="bi bi-arrow-left-circle"></i></div>
+          <div class="next" (click)="nextFunc()"><i class="bi bi-arrow-right-circle"></i></div>
+        </div>
+      </ng-container>
+
+      <ng-template #customButtons>
+        <div class="prev" *ngIf="!sliderOptions.prevButton; else customPrev" (click)="prevFunc()"><i
+            class="bi bi-arrow-left-circle"></i></div>
+        <div class="next" *ngIf="!sliderOptions.nextButton; else customNext" (click)="nextFunc()"><i
+            class="bi bi-arrow-right-circle"></i></div>
+
+        <ng-template #customPrev>
+          <div [innerHtml]="sliderOptions.prevButton" (click)="prevFunc()"></div>
+        </ng-template>
+        <ng-template #customNext>
+          <div [innerHtml]="sliderOptions.nextButton" (click)="nextFunc()"></div>
+        </ng-template>
+      </ng-template>
+
     </div>
     <!-- Indicators -->
     <div class="slider-indicators" *ngIf="sliderOptions.indicators">

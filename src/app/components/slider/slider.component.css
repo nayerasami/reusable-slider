@@ -2,10 +2,12 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+
 }
 
 .slider {
   padding: 20px 0;
+  direction: rtl;
 }
 
 .container-fluid {
@@ -25,8 +27,10 @@
   flex-wrap: nowrap;
   justify-content: flex-start;
   /* overflow: hidden; */
-   transition: transform 0.3s ease;
-  will-change: transform;
+  transition: transform 0.5s linear;
+  flex-direction: rtl;
+
+  /* will-change: transform; */
 
 }
 
@@ -39,7 +43,6 @@
   flex: 0 0 auto;
   box-sizing: border-box;
   margin: 0;
-    transition: transform 0.5s linear;
 
 }
 

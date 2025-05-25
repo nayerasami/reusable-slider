@@ -40,9 +40,11 @@ export class HomeComponent {
     indicators: true,
     infiniteScroll: false,
     isDraggable: true,
-    numberOfVisibleItems: 3.5,
-    stepSize: 3,
-    spaceBetween:12
+    numberOfVisibleItems: 4,
+    stepSize: 1,
+    spaceBetween:12,
+   // animation:'ease-in-out'
+   // nextButton:'<div class="prev"><i class="bi bi-arrow-left-circle"></i></div>'
   }
 
   sliderItems = [
