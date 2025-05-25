@@ -157,7 +157,7 @@ export class SliderComponent implements OnInit {
     // const indicatorEl = e.target as HTMLElement
     // indicatorEl.classList.add('.active')
   }
-
+  
   applyResponsiveOptions(): void {
     const width = window.innerWidth;
     for (let config of this.sortedResponsiveOptons) {
