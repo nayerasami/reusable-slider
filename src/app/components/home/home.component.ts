@@ -38,14 +38,14 @@ export class HomeComponent {
     autoplay: false,
     autoplaySpeed: 3000,
     indicators: true,
-    infiniteScroll: false,
+    infiniteScroll: true,
     isDraggable: true,
     numberOfVisibleItems: 4,
     stepSize: 1,
-    //spaceBetween:12,
-    rtl:true,
+    //spaceBetween:50,
+    rtl:false,
     animation:'ease-in-out',
-   // animationSpeed:'0.2s',
+    animationSpeed:'0.2s',
    // nextButton:'<div class="prev"><i class="bi bi-arrow-left-circle"></i></div>'
   }
 

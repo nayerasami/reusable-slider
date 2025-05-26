@@ -1,13 +1,14 @@
-<section class="slider" >
+<section class="slider" [style.direction]="isRTL ? 'rtl' : 'ltr'">
   <div class="container-fluid">
     <div class="slider-wrap" (mouseenter)="stopAutoplay()" (mouseleave)="startAutoplay()">
       <div class="slider-main" #sliderWrapper [ngStyle]="{
                  transform: 'translateX(' + translateX + '%)',
-                 transition: 'transform 0.3s ' + (sliderOptions.animation ? sliderOptions.animation : 'linear')
+                 transition: 'transform ' + animationSpeed + ' ' + animation
              }">
         @for (item of sliderItems; track trackItemFun(item, $index);) {
-        <div class="slider-item"
-          [ngStyle]="{  width: 'calc(' + (100 / sliderOptions.numberOfVisibleItems) + '% - ' + (sliderOptions.numberOfVisibleItems > 1 ? sliderOptions.spaceBetween : 0) + 'px)', margin: sliderOptions.numberOfVisibleItems > 1 ? '0 ' + (sliderOptions.spaceBetween) + 'px' : '0' }">
+        <div class="slider-item" [ngStyle]="{
+         width: 'calc(' + (100 / numberOfVisibleItems) + '% - ' + (numberOfVisibleItems > 1 ? spaceBetween * 2 : 0) + 'px)',
+         margin: numberOfVisibleItems > 1 ? '0 ' + spaceBetween + 'px' : '0' }">
           <ng-container *ngTemplateOutlet="itemTemplate; context: {$implicit: item} "></ng-container>
         </div>
         }
