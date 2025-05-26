@@ -223,13 +223,20 @@ export class SliderComponent implements OnInit {
   // }
 
   // slide using indicators
-  goToSlide(index: number): void {
-    this.currentIndex = index * this.sliderOptions.numberOfVisibleItems;
-    this.calculateSliderPosition();
-    // const indicatorEl = e.target as HTMLElement
-    // indicatorEl.classList.add('.active')
-  }
 
+  // goToSlide(index: number): void {
+  //   this.currentIndex = index * this.sliderOptions.numberOfVisibleItems;
+  //   this.calculateSliderPosition();
+  //   // const indicatorEl = e.target as HTMLElement
+  //   // indicatorEl.classList.add('.active')
+  // }
+  goToSlide(indicatorIndex: number): void {
+    this.currentIndex = Math.min(indicatorIndex * this.stepSize, this.maxCurrentIndex);
+    this.calculateSliderPosition();
+  }
+    getCurrentIndicatorIndex(): number {
+    return Math.floor(this.currentIndex / this.stepSize);
+  }
   applyResponsiveOptions(): void {
   if (!this.sortedResponsiveOptons || this.sortedResponsiveOptons.length === 0) {
     return;

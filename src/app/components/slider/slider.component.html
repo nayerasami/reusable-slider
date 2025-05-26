@@ -38,11 +38,13 @@
 
     </div>
     <!-- Indicators -->
-    <div class="slider-indicators" *ngIf="sliderOptions.indicators">
+  <div class="slider-indicators" *ngIf="sliderOptions.indicators && indicatorsArray.length > 1">
       @for (item of indicatorsArray; track item; let i = $index) {
-      <div class="indicator" [class.active]="currentIndex === i" (click)="goToSlide(i)">
+      <div class="indicator"
+           [class.active]="getCurrentIndicatorIndex() === i"
+           (click)="goToSlide(i)">
       </div>
       }
-    </div>
+      </div>
   </div>
 </section>
