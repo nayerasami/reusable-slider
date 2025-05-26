@@ -42,8 +42,10 @@ export class HomeComponent {
     isDraggable: true,
     numberOfVisibleItems: 4,
     stepSize: 1,
-    spaceBetween:12,
-   // animation:'ease-in-out'
+    //spaceBetween:12,
+    rtl:true,
+    animation:'ease-in-out',
+   // animationSpeed:'0.2s',
    // nextButton:'<div class="prev"><i class="bi bi-arrow-left-circle"></i></div>'
   }
 

@@ -7,7 +7,7 @@
 
 .slider {
   padding: 20px 0;
-  direction: rtl;
+  /* direction: rtl; */
 }
 
 .container-fluid {
@@ -22,13 +22,13 @@
   height: 150px;
 }
 
-.slider-main {
+.slider-main {                                                                       
   display: flex;
   flex-wrap: nowrap;
   justify-content: flex-start;
   /* overflow: hidden; */
-  transition: transform 0.5s linear;
-  flex-direction: rtl;
+  /* transition: transform 0.5s linear; */
+  /* flex-direction: row-reverse; */
 
   /* will-change: transform; */
 

@@ -18,6 +18,7 @@ export interface SliderOptions {
   spaceBetween?:number;
   rtl?:boolean,
   animation?:'linear' | 'ease-in-out' | 'ease-out' | 'ease-in' | 'ease',
+  animationSpeed?:string,
   nextButton?:string,
   prevButton?:string
 
