@@ -1,50 +1,56 @@
 <section class="slider" [style.direction]="isRTL ? 'rtl' : 'ltr'">
   <div class="container-fluid">
     <div class="slider-wrap" (mouseenter)="stopAutoplay()" (mouseleave)="startAutoplay()">
+      @if(sliderOptions.rows ==1) {
       <div class="slider-main" #sliderWrapper [ngStyle]="{
                  transform: 'translateX(' + translateX + '%)',
-                 transition: 'transform ' + animationSpeed + ' ' + animation
-             }">
+                 transition: 'transform ' + animationSpeed + ' ' + animation,
+                 cursor: sliderOptions.isDraggable ? (isDragging ? 'grabbing' : 'grab') : 'default'}"
+        (mousedown)="onDragStart($event)" (touchstart)="onDragStart($event)" (selectstart)="$event.preventDefault()">
         @for (item of sliderItems; track trackItemFun(item, $index);) {
-        <div class="slider-item" [ngStyle]="{
-         width: 'calc(' + (100 / numberOfVisibleItems) + '% - ' + (numberOfVisibleItems > 1 ? spaceBetween * 2 : 0) + 'px)',
-         margin: numberOfVisibleItems > 1 ? '0 ' + spaceBetween + 'px' : '0' }">
+        <div class="slider-item" [ngStyle]="{ width: 'calc(' + (100 / numberOfVisibleItems) + '% - ' + (numberOfVisibleItems > 1 ? spaceBetween * 2 : 0) + 'px)',
+         margin: numberOfVisibleItems > 1 ? '0 ' + spaceBetween + 'px' : '0',
+         'user-select': isDragging ? 'none' : 'auto',
+         'pointer-events': isDragging ? 'none' : 'auto' }">
           <ng-container *ngTemplateOutlet="itemTemplate; context: {$implicit: item} "></ng-container>
         </div>
         }
       </div>
+      }@else if(sliderOptions.rows ==2) {
+
+      <div class="slider-main">
+
+      </div>
+      }
+
       <!-- Navigation Buttons -->
 
-      <ng-container *ngIf="sliderOptions.navButtons; else customButtons">
+      <ng-container *ngIf="sliderOptions.navButtons">
         <div class="button-area">
-          <div class="prev" (click)="prevFunc()"><i class="bi bi-arrow-left-circle"></i></div>
-          <div class="next" (click)="nextFunc()"><i class="bi bi-arrow-right-circle"></i></div>
+
+          <div class="prev" (click)="prevFunc()" *ngIf="!sliderOptions.prevButton; else customPrev">
+            <i class="bi bi-arrow-left-circle"></i>
+          </div>
+          <div class="next" (click)="nextFunc()" *ngIf="!sliderOptions.nextButton; else customNext">
+            <i class="bi bi-arrow-right-circle"></i>
+          </div>
+
+          <ng-template #customPrev>
+            <div class="next" [innerHtml]="safeNextButton" (click)="nextFunc()"></div>
+          </ng-template>
+          <ng-template #customNext>
+            <div class="prev" [innerHtml]="safePrevButton" (click)="prevFunc()"></div>
+          </ng-template>
         </div>
       </ng-container>
 
-      <ng-template #customButtons>
-        <div class="prev" *ngIf="!sliderOptions.prevButton; else customPrev" (click)="prevFunc()"><i
-            class="bi bi-arrow-left-circle"></i></div>
-        <div class="next" *ngIf="!sliderOptions.nextButton; else customNext" (click)="nextFunc()"><i
-            class="bi bi-arrow-right-circle"></i></div>
-
-        <ng-template #customPrev>
-          <div [innerHtml]="sliderOptions.prevButton" (click)="prevFunc()"></div>
-        </ng-template>
-        <ng-template #customNext>
-          <div [innerHtml]="sliderOptions.nextButton" (click)="nextFunc()"></div>
-        </ng-template>
-      </ng-template>
-
     </div>
     <!-- Indicators -->
-  <div class="slider-indicators" *ngIf="sliderOptions.indicators && indicatorsArray.length > 1">
+    <div class="slider-indicators" *ngIf="sliderOptions.indicators && indicatorsArray.length > 1">
       @for (item of indicatorsArray; track item; let i = $index) {
-      <div class="indicator"
-           [class.active]="getCurrentIndicatorIndex() === i"
-           (click)="goToSlide(i)">
+      <div class="indicator" [class.active]="getCurrentIndicatorIndex() === i" (click)="goToSlide(i)">
       </div>
       }
-      </div>
+    </div>
   </div>
 </section>

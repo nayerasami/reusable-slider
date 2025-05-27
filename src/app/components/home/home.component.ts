@@ -38,15 +38,17 @@ export class HomeComponent {
     autoplay: false,
     autoplaySpeed: 3000,
     indicators: true,
-    infiniteScroll: true,
-    isDraggable: true,
+    infiniteScroll: false,
+    isDraggable: false,
     numberOfVisibleItems: 4,
     stepSize: 1,
     //spaceBetween:50,
     rtl:false,
     animation:'ease-in-out',
     animationSpeed:'0.2s',
-   // nextButton:'<div class="prev"><i class="bi bi-arrow-left-circle"></i></div>'
+    rows:1
+    // nextButton:'<div class="next">next</div>',
+    // prevButton:'<div class="next">pre</div>'
   }
 
   sliderItems = [

@@ -16,10 +16,17 @@ export interface SliderOptions {
   stepSize?:number;
   numberOfVisibleItems:number;
   spaceBetween?:number;
-  rtl?:boolean,
-  animation?:'linear' | 'ease-in-out' | 'ease-out' | 'ease-in' | 'ease',
-  animationSpeed?:string,
-  nextButton?:string,
-  prevButton?:string
+  rtl?:boolean;
+  animation?:'linear' | 'ease-in-out' | 'ease-out' | 'ease-in' | 'ease';
+  animationSpeed?:string;
+  nextButton?:string;
+  prevButton?:string;
+  rows:number;
 
+}
+
+export interface CustomSliderItems {
+  upper?: any;
+  middle?:any;
+  lower?: any;
 }
