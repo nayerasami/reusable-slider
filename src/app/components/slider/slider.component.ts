@@ -41,23 +41,19 @@ export class SliderComponent implements OnInit {
   dragThreshold = 20; // Minimum distance to trigger slide change
   dragOffset = 0;
   initialTranslateX = 0;
-
   safePrevButton: any;
   safeNextButton: any;
-  rowsNumber: number = 1;
-  customSliderItems: CustomSliderItems[] = [];
-  upperItems: any[] = [];
-  lowerItems: any[] = [];
-  middleItems: any[] = [];
+  customSliderItems: any = {};
+  numberOfRows: number = 1;
+  rowsArray: any[] = [];
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['sliderItems'] || changes['sliderOptions']) {
       this.calculateSliderPosition();
       this.stepSize = this.sliderOptions.stepSize || 1;
       this.numberOfVisibleItems = this.sliderOptions.numberOfVisibleItems;
-      //this.indicatorsLength = Math.ceil(this.sliderItems.length / this.sliderOptions.numberOfVisibleItems);
-
+      this.numberOfRows = this.sliderOptions.rows || 1
       this.maxCurrentIndex = (this.sliderItems.length - 1) - (this.numberOfVisibleItems - this.stepSize)
-      const indicatorsNumber = ((this.sliderItems.length - this.sliderOptions.numberOfVisibleItems) / this.stepSize) + 1
+      const indicatorsNumber = (((this.sliderItems.length / this.numberOfRows) - this.sliderOptions.numberOfVisibleItems) / this.stepSize) + 1
       this.indicatorsLength = Math.ceil(indicatorsNumber);
       this.indicatorsArray = Array.from({ length: this.indicatorsLength }, (_, i) => i);
       this.spaceBetween = this.sliderOptions.spaceBetween || 12
@@ -67,42 +63,19 @@ export class SliderComponent implements OnInit {
       this.clonedSliderItems = [...this.sliderItems];
       this.safeNextButton = this.sliderOptions.nextButton ? this.sanitizer.bypassSecurityTrustHtml(this.sliderOptions.nextButton) : '';
       this.safePrevButton = this.sliderOptions.prevButton ? this.sanitizer.bypassSecurityTrustHtml(this.sliderOptions.prevButton) : '';
-      this.rowsNumber = this.sliderOptions.rows || 1
-      // if (this.rowsNumber === 2) {
-      //   for (let i = 0; i < this.sliderItems.length; i += 2) {
-      //     const item = {
-      //       upper: this.sliderItems[i],
-      //       lower: this.sliderItems[i + 1]
-      //     };
-      //     this.customSliderItems.push(item);
-      //     this.upperItems.push(item.upper);
-      //     this.lowerItems.push(item.lower);
-      //   }
-      // } else if (this.rowsNumber === 3) {
-      //   for (let i = 0; i < this.sliderItems.length; i += 3) {
-      //     const item = {
-      //       upper: this.sliderItems[i],
-      //       middle: this.sliderItems[i + 1],
-      //       lower: this.sliderItems[i + 2]
-      //     };
-      //     this.customSliderItems.push(item);
-      //     this.upperItems.push(item.upper);
-      //     this.middleItems.push(item.middle);
-      //     this.lowerItems.push(item.lower);
-      //   }
-      // }
+      this.rowsArray = Array.from({ length: this.sliderOptions.rows }, (_, i) => i)
 
-      for (let i = 0; i < this.sliderItems.length; i += this.rowsNumber) {
-        const item: any = {
-          upper: this.sliderItems[i]
-        };
-        if (this.rowsNumber >= 2) {
-          item.middle = this.sliderItems[i + 1];
+      for (let key = 0; key < this.sliderOptions.rows; key++) {
+        this.customSliderItems[key] = [
+        ]
+      }
+      for (let i = 0; i < this.sliderItems.length; i += this.sliderOptions.rows) {
+        for (let j = 0; j < this.sliderOptions.rows; j++) {
+          const item = this.sliderItems[i + j];
+          if (item !== undefined) {
+            this.customSliderItems[j].push(item);
+          }
         }
-        if (this.rowsNumber === 3) {
-          item.lower = this.sliderItems[i + 2];
-        }
-        this.customSliderItems.push(item);
       }
 
       if (this.sliderOptions.autoplay) {
@@ -121,9 +94,9 @@ export class SliderComponent implements OnInit {
   ngOnInit(): void {
     window.addEventListener('resize', this.onWindowResize.bind(this));
     // this.applyResponsiveOptions()
-    if (this.sliderOptions.autoplay) {
-      this.startAutoplay();
-    }
+    // if (this.sliderOptions.autoplay) {
+    //   this.startAutoplay();
+    // }
     if (this.responsiveOptions.length) {
       this.sortedResponsiveOptons = this.responsiveOptions.sort((a: any, b: any) => parseInt(a.breakpoint.replace('px', ''), 10) - parseInt(b.breakpoint.replace('px', ''), 10));
       this.largestBreakpoint = this.sortedResponsiveOptons.pop();
@@ -172,9 +145,9 @@ export class SliderComponent implements OnInit {
         };
         this.numberOfVisibleItems = config.numVisible;
         this.stepSize = config.numScroll;
-        this.maxCurrentIndex = (this.sliderItems.length - 1) - (config.numVisible - config.numScroll);
+        this.maxCurrentIndex = ((this.sliderItems.length - 1) / this.numberOfRows) - (config.numVisible - config.numScroll);
 
-        const indicatorsNumber = ((this.sliderItems.length - config.numVisible) / config.numScroll) + 1;
+        const indicatorsNumber = (((this.sliderItems.length / this.numberOfRows) - config.numVisible) / config.numScroll) + 1;
         this.indicatorsLength = Math.ceil(indicatorsNumber);
         this.indicatorsArray = Array.from({ length: this.indicatorsLength }, (_, i) => i);
 
@@ -192,10 +165,10 @@ export class SliderComponent implements OnInit {
       this.numberOfVisibleItems = this.largestBreakpoint.numVisible;
       this.stepSize = this.largestBreakpoint.numScroll || 1;
 
-      const indicatorsNumber = ((this.sliderItems.length - this.largestBreakpoint.numVisible) / this.stepSize) + 1;
+      const indicatorsNumber = (((this.sliderItems.length / this.numberOfRows) - this.largestBreakpoint.numVisible) / this.stepSize) + 1;
       this.indicatorsLength = Math.ceil(indicatorsNumber);
       this.indicatorsArray = Array.from({ length: this.indicatorsLength }, (_, i) => i);
-      this.maxCurrentIndex = (this.sliderItems.length - 1) - (this.largestBreakpoint.numVisible - this.stepSize);
+      this.maxCurrentIndex = ((this.sliderItems.length - 1) / this.numberOfRows) - (this.largestBreakpoint.numVisible - this.stepSize);
     }
 
     // Reset current index if it exceeds the new maximum
@@ -208,7 +181,7 @@ export class SliderComponent implements OnInit {
 
   nextFunc() {
     const step = this.stepSize;
-    const maxIndex = this.sliderItems.length - this.sliderOptions.numberOfVisibleItems;
+    const maxIndex = Math.ceil((this.sliderItems.length / this.numberOfRows)  - this.sliderOptions.numberOfVisibleItems);
     if (this.sliderOptions.infiniteScroll) {
       if (this.isRTL) {
         this.currentIndex -= step;
@@ -241,7 +214,7 @@ export class SliderComponent implements OnInit {
 
   prevFunc() {
     const step = this.stepSize;
-    const maxIndex = this.sliderItems.length - this.sliderOptions.numberOfVisibleItems;
+    const maxIndex = Math.ceil((this.sliderItems.length / this.numberOfRows) - this.sliderOptions.numberOfVisibleItems);
     if (this.sliderOptions.infiniteScroll) {
       if (this.isRTL) {
         this.currentIndex += step;
@@ -272,7 +245,7 @@ export class SliderComponent implements OnInit {
     this.calculateSliderPosition();
   }
 
-  // slide using indicators
+  // indicators
   goToSlide(indicatorIndex: number): void {
     this.currentIndex = Math.min(indicatorIndex * this.stepSize, this.maxCurrentIndex);
     this.calculateSliderPosition();
@@ -283,13 +256,12 @@ export class SliderComponent implements OnInit {
 
 
 
-
-  //apply drag
+  // drag
   private getX(event: MouseEvent | TouchEvent): number {
     return event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;
   }
 
-  // Drag functionality methods
+
   onDragStart(event: MouseEvent | TouchEvent): void {
     if (!this.sliderOptions.isDraggable) return;
 
@@ -365,7 +337,6 @@ export class SliderComponent implements OnInit {
     }
   }
 
-  // Host listeners for drag events
   @HostListener('window:mouseup', ['$event'])
   onMouseUp(event: MouseEvent) {
     if (this.isDragging) {
@@ -395,12 +366,12 @@ export class SliderComponent implements OnInit {
   }
 
 
-  //handle autoplay
+  // autoplay
   startAutoplay(): void {
     if (this.sliderOptions.autoplay) {
       this.autoplayInterval = setInterval(() => {
         this.nextFunc();
-      }, this.sliderOptions.autoplaySpeed || 3000); //default 3s
+      }, this.sliderOptions.autoplaySpeed || 1000); //default 3s
     }
   }
 

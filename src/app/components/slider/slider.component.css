@@ -19,13 +19,12 @@
 .slider-wrap {
   position: relative;
   overflow: hidden;
-  height: 150px;
 }
 
 .slider-main {
   display: flex;
-  flex-wrap: nowrap;
   justify-content: flex-start;
+  flex-direction: row;
   /* overflow: hidden; */
   /* transition: transform 0.5s linear; */
   /* flex-direction: row-reverse; */
@@ -46,19 +45,18 @@
 
 }
 
-.custom-slider-items{
+.custom-slider-main {
+  display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  height: 150px;
-  background: pink;
-  font-size: 26px;
-  font-weight: 600;
-  position: relative;
-  flex: 0 0 auto;
-  box-sizing: border-box;
-  margin: 0;
+  gap: 12px;
+  /* Adds 12px space between each row */
 }
+
+.custom-slider-row {
+  display: flex;
+  width: 100%;
+}
+
 .text {
   position: absolute;
   top: 50%;
@@ -84,6 +82,7 @@
   font-size: 30px;
   cursor: pointer;
 }
+
 .slider-indicators {
   display: flex;
   justify-content: center;

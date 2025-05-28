@@ -16,9 +16,22 @@
         </div>
         }
       </div>
-      }@else if(sliderOptions.rows ==2) {
+      }@else if(sliderOptions.rows > 1) {
+      <div class="custom-slider-main" #sliderWrapper [ngStyle]="{
+                 transform: 'translateX(' + translateX + '%)',
+                 transition: 'transform ' + animationSpeed + ' ' + animation,
+                 cursor: sliderOptions.isDraggable ? (isDragging ? 'grabbing' : 'grab') : 'default'}">
+        @for(row of rowsArray; track trackItemFun(row, $index);) {
+        <div class="custom-slider-row">
+          @for (item of customSliderItems[row] ; track trackItemFun(item, $index);) {
+          <div class="slider-item" [ngStyle]="{ width: 'calc(' + (100 / numberOfVisibleItems) + '% - ' + (numberOfVisibleItems > 1 ? spaceBetween * 2 : 0) + 'px)',
+         margin: numberOfVisibleItems > 1 ? '0 ' + spaceBetween + 'px' : '0' }">
+            <ng-container *ngTemplateOutlet="itemTemplate; context: {$implicit: item} "></ng-container>
+          </div>
+          }
+        </div>
+        }
 
-      <div class="slider-main">
 
       </div>
       }

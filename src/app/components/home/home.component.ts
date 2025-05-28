@@ -14,12 +14,12 @@ export class HomeComponent {
   responsiveOptions: ResponsiveConfig[] = [
     {
       breakpoint: '1400px',
-      numVisible: 4,
+      numVisible: 3,
       numScroll: 1
     },
     {
       breakpoint: '1199px',
-      numVisible: 4,
+      numVisible: 3,
       numScroll: 1
     },
     {
@@ -34,32 +34,39 @@ export class HomeComponent {
     }
   ];
   sliderOptions: SliderOptions = {
-    navButtons: true,
-    autoplay: false,
+    navButtons: false,
+    autoplay: true,
     autoplaySpeed: 3000,
-    indicators: true,
+    indicators: false,
     infiniteScroll: false,
     isDraggable: false,
-    numberOfVisibleItems: 4,
+    numberOfVisibleItems: 3,
     stepSize: 1,
     //spaceBetween:50,
-    rtl:false,
-    animation:'ease-in-out',
-    animationSpeed:'0.2s',
+    rtl: false,
+    animation: 'ease-in-out',
+    animationSpeed: '0.8s',
     rows:1
     // nextButton:'<div class="next">next</div>',
     // prevButton:'<div class="next">pre</div>'
   }
 
   sliderItems = [
-    { id: 1, name: 'item1' },
-    { id: 2, name: 'item2' },
-    { id: 3, name: 'item3' },
-    { id: 4, name: 'item4' },
-    { id: 5, name: 'item5' },
-    { id: 6, name: 'item6' },
-    { id: 7, name: 'item7' },
-    { id: 8, name: 'item8' },
+    { id: 1, name: 'slide 1' },
+    { id: 2, name: 'slide 2' },
+    { id: 3, name: 'slide 3' },
+    { id: 4, name: 'slide 4' },
+    { id: 5, name: 'slide 5' },
+    { id: 6, name: 'slide 6' },
+    { id: 7, name: 'slide 7' },
+    { id: 8, name: 'slide 8' },
+    { id: 9, name: 'slide 9' },
+    { id: 10, name: 'slide 10' },
+    { id: 11, name: 'slide 11' },
+    { id: 12, name: 'slide 12' },
+    { id: 13, name: 'slide 13' },
+    { id: 14, name: 'slide 14' },
+    // { id: 15, name: 'slide 15' },
   ]
 
 
