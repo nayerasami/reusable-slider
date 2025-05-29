@@ -52,7 +52,7 @@ export class SliderComponent implements OnInit {
       this.stepSize = this.sliderOptions.stepSize || 1;
       this.numberOfVisibleItems = this.sliderOptions.numberOfVisibleItems;
       this.numberOfRows = this.sliderOptions.rows || 1
-      this.maxCurrentIndex = (this.sliderItems.length - 1) - (this.numberOfVisibleItems - this.stepSize)
+      this.maxCurrentIndex = ((this.sliderItems.length - 1) / this.numberOfRows) - (this.numberOfVisibleItems - this.stepSize)
       const indicatorsNumber = (((this.sliderItems.length / this.numberOfRows) - this.sliderOptions.numberOfVisibleItems) / this.stepSize) + 1
       this.indicatorsLength = Math.ceil(indicatorsNumber);
       this.indicatorsArray = Array.from({ length: this.indicatorsLength }, (_, i) => i);
@@ -179,10 +179,13 @@ export class SliderComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
+  animated:boolean=true;
   nextFunc() {
     const step = this.stepSize;
-    const maxIndex = Math.ceil((this.sliderItems.length / this.numberOfRows)  - this.sliderOptions.numberOfVisibleItems);
+    let maxIndex = Math.ceil((this.sliderItems.length / this.numberOfRows) - this.sliderOptions.numberOfVisibleItems);
+    console.log(maxIndex, ' max')
     if (this.sliderOptions.infiniteScroll) {
+
       if (this.isRTL) {
         this.currentIndex -= step;
         if (this.currentIndex < 0) {
@@ -190,12 +193,35 @@ export class SliderComponent implements OnInit {
           this.currentIndex = totalItems - (totalItems % step || step);
         }
       } else {
+
+        // if (this.currentIndex > this.maxCurrentIndex) {
+        //   this.currentIndex = 0;
+        // }
+
+        // const firstItmeIndex = this.currentIndex + step;
+        // const lastItemIndex = this.currentIndex + this.numberOfVisibleItems;
+        // this.currentIndex += step;
+        // console.log('first index', firstItmeIndex);
+        // console.log('last index', lastItemIndex);
+        // console.log('length', this.sliderItems.length)
+
+        // if (this.currentIndex > maxIndex) {
+        //   const newArr = this.sliderItems.splice(0, firstItmeIndex - 1);
+        //   console.log('new array', newArr);
+
+        //   this.sliderItems.push(...newArr);
+        //   console.log('old array', this.sliderItems);
+        //   maxIndex = lastItemIndex-1;
+        // }
+
+
         this.currentIndex += step;
-        if (this.currentIndex > this.maxCurrentIndex) {
-          this.currentIndex = 0;
+        if (this.currentIndex > maxIndex) {
+          const itemsToMove = this.sliderItems.splice(0, step);
+          this.sliderItems.push(...itemsToMove);
+          this.currentIndex = maxIndex;
         }
       }
-
     } else {
       if (this.isRTL) {
         if (this.currentIndex - step >= 0) {
@@ -371,7 +397,7 @@ export class SliderComponent implements OnInit {
     if (this.sliderOptions.autoplay) {
       this.autoplayInterval = setInterval(() => {
         this.nextFunc();
-      }, this.sliderOptions.autoplaySpeed || 1000); //default 3s
+      }, this.sliderOptions.autoplaySpeed || 3000); //default 3s
     }
   }
 
