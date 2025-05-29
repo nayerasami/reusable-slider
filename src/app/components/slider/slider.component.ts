@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, ContentChild, ElementRef, HostListener, Input, OnInit, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { ResponsiveConfig, SliderOptions, CustomSliderItems, } from './interfaces/sliderTypes';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-
+import Hammer from 'hammerjs';
 @Component({
   selector: 'app-slider',
   imports: [CommonModule],
@@ -12,7 +12,8 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 export class SliderComponent implements OnInit {
   constructor(private cdr: ChangeDetectorRef, private sanitizer: DomSanitizer) { }
   @ContentChild('itemTemplate') itemTemplate!: TemplateRef<any>;
-  @ViewChild('sliderWrapper', { static: true }) sliderMain!: ElementRef;
+  @ViewChild('singleRowSlider', { static: false }) singleRowSlider!: ElementRef;
+  @ViewChild('multiRowSlider', { static: false }) multiRowSlider!: ElementRef;
   @Input() responsiveOptions: any;
   @Input() sliderOptions: any
   @Input() sliderItems: any[] = [];
@@ -35,17 +36,19 @@ export class SliderComponent implements OnInit {
   spaceBetween: number = 0;
   clonedSliderItems: any[] = [];
   // Drag properties
-  isDragging: boolean = false;
-  startX = 0;
-  currentX = 0;
-  dragThreshold = 20; // Minimum distance to trigger slide change
-  dragOffset = 0;
+  //isDragging: boolean = false;
+  // startX = 0;
+  // currentX = 0;
+  // dragThreshold = 20; // Minimum distance to trigger slide change
+  // dragOffset = 0;
   initialTranslateX = 0;
   safePrevButton: any;
   safeNextButton: any;
   customSliderItems: any = {};
   numberOfRows: number = 1;
   rowsArray: any[] = [];
+  isTransitionEnabled = true;
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['sliderItems'] || changes['sliderOptions']) {
       this.calculateSliderPosition();
@@ -53,6 +56,7 @@ export class SliderComponent implements OnInit {
       this.numberOfVisibleItems = this.sliderOptions.numberOfVisibleItems;
       this.numberOfRows = this.sliderOptions.rows || 1
       this.maxCurrentIndex = ((this.sliderItems.length - 1) / this.numberOfRows) - (this.numberOfVisibleItems - this.stepSize)
+     // this.maxCurrentIndex = Math.ceil((this.sliderItems.length / this.numberOfRows) - (this.numberOfVisibleItems - this.stepSize));
       const indicatorsNumber = (((this.sliderItems.length / this.numberOfRows) - this.sliderOptions.numberOfVisibleItems) / this.stepSize) + 1
       this.indicatorsLength = Math.ceil(indicatorsNumber);
       this.indicatorsArray = Array.from({ length: this.indicatorsLength }, (_, i) => i);
@@ -105,6 +109,18 @@ export class SliderComponent implements OnInit {
     }
 
   }
+  hammer?: HammerManager;
+  isDragging: boolean = false;
+  dragStartTranslateX: number = 0;
+  dragThreshold: number = 50; // Minimum drag distance to trigger slide change
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.initializeHammer();
+    }, 0);
+  }
+
+
 
   onWindowResize = () => {
     clearTimeout(this.resizeTimeout);
@@ -118,15 +134,21 @@ export class SliderComponent implements OnInit {
     return index
   }
 
-  calculateSliderPosition() {
-    // Calculate the width of each item including space between
-    const itemWidth = 100 / this.sliderOptions.numberOfVisibleItems;
-    // Calculate translate position based on current index
-    if (this.isRTL) {
-      this.translateX = +(this.currentIndex * itemWidth);
+
+  calculateSliderPosition(isLastStep = false) {
+
+    if (isLastStep) {
+
     } else {
-      this.translateX = -(this.currentIndex * itemWidth);
+      const itemWidth = 100 / this.sliderOptions.numberOfVisibleItems;
+      if (this.isRTL) {
+        this.translateX = +(this.currentIndex * itemWidth);
+      } else {
+        this.translateX = -(this.currentIndex * itemWidth);
+      }
     }
+
+
   }
   applyResponsiveOptions(): void {
     if (!this.sortedResponsiveOptons || this.sortedResponsiveOptons.length === 0) {
@@ -179,9 +201,9 @@ export class SliderComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  animated:boolean=true;
   nextFunc() {
     const step = this.stepSize;
+    let isLastStep;
     let maxIndex = Math.ceil((this.sliderItems.length / this.numberOfRows) - this.sliderOptions.numberOfVisibleItems);
     console.log(maxIndex, ' max')
     if (this.sliderOptions.infiniteScroll) {
@@ -194,33 +216,23 @@ export class SliderComponent implements OnInit {
         }
       } else {
 
-        // if (this.currentIndex > this.maxCurrentIndex) {
-        //   this.currentIndex = 0;
-        // }
+        console.log(this.maxCurrentIndex , 'max current index')
+        console.log(this.currentIndex ,'current index')
+        if (this.currentIndex == this.maxCurrentIndex-1) {
 
-        // const firstItmeIndex = this.currentIndex + step;
-        // const lastItemIndex = this.currentIndex + this.numberOfVisibleItems;
-        // this.currentIndex += step;
-        // console.log('first index', firstItmeIndex);
-        // console.log('last index', lastItemIndex);
-        // console.log('length', this.sliderItems.length)
+          isLastStep = true;
+          const itemsToMove = this.sliderItems.splice(0, this.numberOfVisibleItems);
+          const otherItems = [...this.sliderItems]
+          //   this.sliderItems = [];
+          //this.sliderItems.push(...itemsToMove);
+          this.sliderItems.push(...otherItems, ...this.clonedSliderItems);
+          //this.currentIndex=0;
+          // console.log(this.sliderItems, 'slider itemms');
 
-        // if (this.currentIndex > maxIndex) {
-        //   const newArr = this.sliderItems.splice(0, firstItmeIndex - 1);
-        //   console.log('new array', newArr);
-
-        //   this.sliderItems.push(...newArr);
-        //   console.log('old array', this.sliderItems);
-        //   maxIndex = lastItemIndex-1;
-        // }
-
-
-        this.currentIndex += step;
-        if (this.currentIndex > maxIndex) {
-          const itemsToMove = this.sliderItems.splice(0, step);
-          this.sliderItems.push(...itemsToMove);
-          this.currentIndex = maxIndex;
+        } else {
+          this.currentIndex += step;
         }
+
       }
     } else {
       if (this.isRTL) {
@@ -228,13 +240,13 @@ export class SliderComponent implements OnInit {
           this.currentIndex -= step;
         }
       } else {
-        if (this.currentIndex + step <= maxIndex) {
+        if (this.currentIndex + step <= this.maxCurrentIndex) {
           this.currentIndex += step;
         }
       }
 
     }
-    this.calculateSliderPosition();
+    this.calculateSliderPosition(isLastStep);
 
   }
 
@@ -257,7 +269,7 @@ export class SliderComponent implements OnInit {
 
     } else {
       if (this.isRTL) {
-        if (this.currentIndex + step <= maxIndex) {
+        if (this.currentIndex + step <= this.maxCurrentIndex) {
           this.currentIndex += step;
         }
       } else {
@@ -283,114 +295,134 @@ export class SliderComponent implements OnInit {
 
 
   // drag
-  private getX(event: MouseEvent | TouchEvent): number {
-    return event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;
+  private initializeHammer() {
+    // Determine which slider element is active based on rows configuration
+    let sliderElement: HTMLElement | null = null;
+
+    if (this.sliderOptions.rows == 1) {
+      if (this.singleRowSlider && this.singleRowSlider.nativeElement) {
+        sliderElement = this.singleRowSlider.nativeElement;
+      }
+    } else if (this.sliderOptions.rows > 1) {
+      if (this.multiRowSlider && this.multiRowSlider.nativeElement) {
+        sliderElement = this.multiRowSlider.nativeElement;
+      }
+    }
+
+    if (!sliderElement) {
+      console.warn('Slider element not found');
+      return;
+    }
+
+    this.hammer = new Hammer(sliderElement);
+
+    this.hammer.get('pan').set({
+      direction: Hammer.DIRECTION_HORIZONTAL,
+      threshold: 10
+    });
+
+    // Handle pan start
+    this.hammer.on('panstart', (ev) => {
+      this.onDragStart(ev);
+    });
+
+    // Handle pan move
+    this.hammer.on('panmove', (ev) => {
+      this.onDragMove(ev);
+    });
+
+    // Handle pan end
+    this.hammer.on('panend', (ev) => {
+      this.onDragEnd(ev);
+    });
   }
 
-
-  onDragStart(event: MouseEvent | TouchEvent): void {
+  private onDragStart(event: any): void {
+    ;
     if (!this.sliderOptions.isDraggable) return;
 
-    // event.preventDefault();
     this.isDragging = true;
-    this.startX = this.getX(event);
-    this.currentX = this.startX;
-    this.initialTranslateX = this.translateX;
-    this.dragOffset = 0;
-
-    // Stop autoplay during drag
+    this.dragStartTranslateX = this.translateX;
+    console.log(this.dragStartTranslateX, ' drag start translate X')
     if (this.sliderOptions.autoplay) {
       this.stopAutoplay();
     }
+
+    this.isTransitionEnabled = false;
   }
 
-  onDragMove(event: MouseEvent | TouchEvent): void {
+  private onDragMove(event: any): void {
     if (!this.isDragging || !this.sliderOptions.isDraggable) return;
 
-    //  event.preventDefault();
-    this.currentX = this.getX(event);
-    this.dragOffset = this.currentX - this.startX;
-
-    // Calculate the percentage offset based on container width
-    const containerWidth = this.sliderMain.nativeElement.offsetWidth;
-    const dragPercentage = (this.dragOffset / containerWidth) * 100;
+    // Calculate drag percentage based on container width
+    const containerWidth = this.numberOfRows > 1 ? this.multiRowSlider.nativeElement.offsetWidth : this.singleRowSlider.nativeElement.offsetWidth;
+    const dragPercentage = (event.deltaX / containerWidth) * 100;
 
     // Apply drag offset to current translate position
     if (this.isRTL) {
-      this.translateX = this.initialTranslateX - dragPercentage;
+      this.translateX = this.dragStartTranslateX - dragPercentage;
     } else {
-      this.translateX = this.initialTranslateX + dragPercentage;
+      this.translateX = this.dragStartTranslateX + dragPercentage;
     }
+
+    // Trigger change detection to update the view
+    this.cdr.detectChanges();
   }
 
-  onDragEnd(event: MouseEvent | TouchEvent): void {
+
+  private onDragEnd(event: any): void {
     if (!this.isDragging || !this.sliderOptions.isDraggable) return;
 
     this.isDragging = false;
+    this.isTransitionEnabled = true; // Re-enable transitions
 
-    // Determine if drag was significant enough to change slide
-    const dragDistance = Math.abs(this.dragOffset);
+    // Calculate drag percentage relative to container width
+    const containerWidth = this.numberOfRows > 1 ? this.multiRowSlider.nativeElement.offsetWidth : this.singleRowSlider.nativeElement.offsetWidth;
+    const dragPercentage = Math.abs(event.deltaX) / containerWidth;
 
-    if (dragDistance > this.dragThreshold) {
-      // Determine direction and trigger appropriate slide change
+    // Calculate how many steps the drag represents
+    const stepWidth = 100 / this.numberOfVisibleItems; // Width of one visible item in percentage
+    const stepsToMove = Math.ceil((dragPercentage * 100) / stepWidth);
+
+    // Only move if drag exceeds threshold AND represents at least one step
+    const dragDistance = Math.abs(event.deltaX);
+    const shouldMove = dragDistance > this.dragThreshold && stepsToMove > 0;
+
+    if (shouldMove) {
+      // Calculate target index based on stepSize and drag direction
+      let targetIndex = this.currentIndex;
+
       if (this.isRTL) {
-        if (this.dragOffset > 0) {
-          this.nextFunc();
+        if (event.deltaX > 0) {
+          // Dragging right in RTL = next
+          targetIndex = Math.min(this.currentIndex + this.stepSize, this.maxCurrentIndex);
         } else {
-          this.prevFunc();
+          // Dragging left in RTL = previous
+          targetIndex = Math.max(this.currentIndex - this.stepSize, 0);
         }
       } else {
-        if (this.dragOffset > 0) {
-          this.prevFunc();
+        if (event.deltaX > 0) {
+          // Dragging right in LTR = previous
+          targetIndex = Math.max(this.currentIndex - this.stepSize, 0);
         } else {
-          this.nextFunc();
+          // Dragging left in LTR = next
+          targetIndex = Math.min(this.currentIndex + this.stepSize, this.maxCurrentIndex);
         }
       }
+
+      // Set the new index and calculate position
+      this.currentIndex = targetIndex;
+      this.calculateSliderPosition();
     } else {
-      // Snap back to current position
+      // Snap back to current position if drag wasn't significant
       this.calculateSliderPosition();
     }
-
-    // Reset drag properties
-    this.dragOffset = 0;
-    this.startX = 0;
-    this.currentX = 0;
-    this.initialTranslateX = 0;
 
     // Restart autoplay if enabled
     if (this.sliderOptions.autoplay) {
       this.startAutoplay();
     }
   }
-
-  @HostListener('window:mouseup', ['$event'])
-  onMouseUp(event: MouseEvent) {
-    if (this.isDragging) {
-      this.onDragEnd(event);
-    }
-  }
-
-  @HostListener('window:mousemove', ['$event'])
-  onMouseMove(event: MouseEvent) {
-    if (this.isDragging) {
-      this.onDragMove(event);
-    }
-  }
-
-  @HostListener('window:touchend', ['$event'])
-  onTouchEnd(event: TouchEvent) {
-    if (this.isDragging) {
-      this.onDragEnd(event);
-    }
-  }
-
-  @HostListener('window:touchmove', ['$event'])
-  onTouchMove(event: TouchEvent) {
-    if (this.isDragging) {
-      this.onDragMove(event);
-    }
-  }
-
 
   // autoplay
   startAutoplay(): void {
