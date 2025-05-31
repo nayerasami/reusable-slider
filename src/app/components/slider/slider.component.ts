@@ -135,21 +135,15 @@ export class SliderComponent implements OnInit {
   }
 
 
-  calculateSliderPosition(isLastStep = false) {
-
-    if (isLastStep) {
-
-    } else {
+  calculateSliderPosition() {
       const itemWidth = 100 / this.sliderOptions.numberOfVisibleItems;
       if (this.isRTL) {
         this.translateX = +(this.currentIndex * itemWidth);
       } else {
         this.translateX = -(this.currentIndex * itemWidth);
-      }
-    }
-
-
+      }  
   }
+
   applyResponsiveOptions(): void {
     if (!this.sortedResponsiveOptons || this.sortedResponsiveOptons.length === 0) {
       return;
@@ -244,9 +238,9 @@ export class SliderComponent implements OnInit {
           this.currentIndex += step;
         }
       }
+    this.calculateSliderPosition();
 
     }
-    this.calculateSliderPosition(isLastStep);
 
   }
 
@@ -277,10 +271,9 @@ export class SliderComponent implements OnInit {
           this.currentIndex -= step;
         }
       }
-
+       this.calculateSliderPosition();
     }
 
-    this.calculateSliderPosition();
   }
 
   // indicators
