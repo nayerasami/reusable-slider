@@ -40,7 +40,7 @@ export class HomeComponent {
     autoplaySpeed: 3000,
     indicators: true,
     infiniteScroll: true,
-    isDraggable: false,
+    //isDraggable: false,
     numberOfVisibleItems: 3,
     stepSize: 1,
     //spaceBetween:50,

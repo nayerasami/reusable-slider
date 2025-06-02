@@ -6,9 +6,9 @@
            [ngStyle]="{
              transform: 'translateX(' + translateX + '%)',
              transition: isTransitionEnabled ? ('transform ' + animationSpeed + ' ' + animation) : 'none',
-             cursor: sliderOptions.isDraggable ? (isDragging ? 'grabbing' : 'grab') : 'default'
+             cursor: isDraggable ? (isDragging ? 'grabbing' : 'grab') : 'default'
            }"
-           [attr.data-draggable]="sliderOptions.isDraggable">
+           [attr.data-draggable]="isDraggable">
         @for (item of sliderItems; track trackItemFun(item, $index);) {
         <div class="slider-item"
              [ngStyle]="{
@@ -25,8 +25,8 @@
       <div class="custom-slider-main" #multiRowSlider  [ngStyle]="{
              transform: 'translateX(' + translateX + '%)',
              transition: 'transform ' + animationSpeed + ' ' + animation,
-             cursor: sliderOptions.isDraggable ? (isDragging ? 'grabbing' : 'grab') : 'default' }"
-           [attr.data-draggable]="sliderOptions.isDraggable">
+             cursor: isDraggable ? (isDragging ? 'grabbing' : 'grab') : 'default' }"
+           [attr.data-draggable]="isDraggable">
         @for(row of rowsArray; track trackItemFun(row, $index);) {
         <div class="custom-slider-row">
           @for (item of customSliderItems[row]; track trackItemFun(item, $index);) {
@@ -65,7 +65,6 @@
     <div class="slider-indicators" *ngIf="sliderOptions.indicators && indicatorsArray.length > 1">
       @for (item of indicatorsArray; track item; let i = $index) {
       <div class="indicator" [class.active]="getCurrentIndicatorIndex() === i " (click)="goToSlide(i)">
-     {{i}}
       </div>
       }
     </div>
