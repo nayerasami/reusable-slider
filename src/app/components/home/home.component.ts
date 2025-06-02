@@ -14,7 +14,7 @@ export class HomeComponent {
   responsiveOptions: ResponsiveConfig[] = [
     {
       breakpoint: '1400px',
-      numVisible: 3,
+      numVisible: 4,
       numScroll:1
     },
     {
@@ -40,7 +40,7 @@ export class HomeComponent {
     autoplaySpeed: 3000,
     indicators: true,
     infiniteScroll: true,
-    isDraggable: true,
+    isDraggable: false,
     numberOfVisibleItems: 3,
     stepSize: 1,
     //spaceBetween:50,
