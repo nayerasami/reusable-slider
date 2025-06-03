@@ -25,7 +25,7 @@ import Hammer from 'hammerjs';
   styleUrl: './slider.component.css',
 })
 export class SliderComponent implements OnInit {
-  constructor(private cdr: ChangeDetectorRef,private sanitizer: DomSanitizer ) { }
+  constructor(private cdr: ChangeDetectorRef, private sanitizer: DomSanitizer) { }
   @ContentChild('itemTemplate') itemTemplate!: TemplateRef<any>;
   @ViewChild('singleRowSlider', { static: false }) singleRowSlider!: ElementRef;
   @ViewChild('multiRowSlider', { static: false }) multiRowSlider!: ElementRef;
@@ -108,7 +108,6 @@ export class SliderComponent implements OnInit {
     this.indicatorsLength = Math.ceil(totalSlides);
     this.indicatorsArray = Array.from({ length: this.indicatorsLength }, (_, i) => i);
     this.maxCurrentIndex = (this.sliderItems.length - 1) / this.numberOfRows - (this.numberOfVisibleItems - this.stepSize);
-
   }
 
   handleInfiniteScrollSliderItems() {
@@ -118,10 +117,10 @@ export class SliderComponent implements OnInit {
       this.translateX = 0;
     } else {
       this.sliderItems = [...this.clonedSliderItems];
-      const startClone = this.sliderItems.slice(0, this.numberOfVisibleItems);
-      const endClone = this.sliderItems.slice(-this.numberOfVisibleItems);
+      const startClone = this.sliderItems.slice(0,  this.numberOfVisibleItems);
+      const endClone = this.sliderItems.slice(- this.numberOfVisibleItems);
       this.sliderItems = [...endClone, ...this.sliderItems, ...startClone];
-      this.currentIndex = this.numberOfVisibleItems;
+      this.currentIndex =  this.numberOfVisibleItems;
       this.translateX = -(this.currentIndex * (100 / this.numberOfVisibleItems));
     }
   }
@@ -229,14 +228,13 @@ export class SliderComponent implements OnInit {
     this.currentIndex += forward ? this.stepSize : -this.stepSize;
     this.isTransitionEnabled = true;
     this.calculateSliderPosition();
-
     const timeout = parseFloat(this.animationSpeed) * 1000;
     setTimeout(() => {
       this.isTransitionEnabled = false;
-      if (forward && this.currentIndex >= this.sliderItems.length - this.numberOfVisibleItems) {
-        this.currentIndex = this.numberOfVisibleItems;
-      } else if (!forward && this.currentIndex < this.numberOfVisibleItems) {
-        this.currentIndex = this.sliderItems.length - this.numberOfVisibleItems * this.stepSize;
+      if (forward && this.currentIndex >= this.sliderItems.length -  this.numberOfVisibleItems) {
+        this.currentIndex =  this.numberOfVisibleItems + (this.clonedSliderItems.length % this.stepSize == 0 ? 0 : (this.currentIndex - this.numberOfVisibleItems - this.clonedSliderItems.length));
+      } else if (!forward && this.currentIndex <  this.numberOfVisibleItems) {
+        this.currentIndex = this.sliderItems.length -  this.numberOfVisibleItems - this.stepSize;
       }
       this.calculateSliderPosition();
     }, timeout);

@@ -14,8 +14,8 @@ export class HomeComponent {
   responsiveOptions: ResponsiveConfig[] = [
     {
       breakpoint: '1400px',
-      numVisible: 4,
-      numScroll:3
+      numVisible:4,
+      numScroll:2
     },
     {
       breakpoint: '1199px',
@@ -41,8 +41,8 @@ export class HomeComponent {
     indicators: true,
     infiniteScroll: true,
     isDraggable: false,
-   // numberOfVisibleItems: 3,
-   // stepSize: 1,
+    numberOfVisibleItems: 4,
+    stepSize:3,
     //spaceBetween:50,
     rtl: false,
     animation: 'ease-in-out',
@@ -60,12 +60,12 @@ export class HomeComponent {
     { id: 5, name: 'slide 5' },
     { id: 6, name: 'slide 6' },
     { id: 7, name: 'slide 7' },
-    { id: 8, name: 'slide 8' },
+    // { id: 8, name: 'slide 8' },
     // { id: 9, name: 'slide 9' },
-    // { id: 10, name: 'slide 10' },
-   // { id: 11, name: 'slide 11' },
-    // { id: 12, name: 'slide 12' },
-    // { id: 13, name: 'slide 13' },
+   // { id: 10, name: 'slide 10' },
+    //{ id: 11, name: 'slide 11' },
+   // { id: 12, name: 'slide 12' },
+    //{ id: 13, name: 'slide 13' },
     // { id: 14, name: 'slide 14' },
     // { id: 15, name: 'slide 15' },
   ]
