@@ -104,12 +104,21 @@ export class SliderComponent implements OnInit {
   }
 
   calculateIndicators() {
+    if (this.isInfiniteScroll) {
+    // For infinite scroll, indicators represent positions in the original items only
+    const originalLength = this.clonedSliderItems.length;
+    const totalSlides = Math.ceil(originalLength / this.stepSize);
+    this.indicatorsLength = totalSlides;
+    this.indicatorsArray = Array.from({ length: this.indicatorsLength }, (_, i) => i);
+    // maxCurrentIndex is not used in infinite scroll, but set it for consistency
+    this.maxCurrentIndex = originalLength - this.numberOfVisibleItems;
+  } else {
     const totalSlides = (this.clonedSliderItems.length / this.numberOfRows - this.numberOfVisibleItems) / this.stepSize + 1;
     this.indicatorsLength = Math.ceil(totalSlides);
     this.indicatorsArray = Array.from({ length: this.indicatorsLength }, (_, i) => i);
     this.maxCurrentIndex = (this.sliderItems.length - 1) / this.numberOfRows - (this.numberOfVisibleItems - this.stepSize);
   }
-
+  }
   handleInfiniteScrollSliderItems() {
     if (!this.isInfiniteScroll) {
       this.sliderItems = [...this.clonedSliderItems];
@@ -227,7 +236,7 @@ export class SliderComponent implements OnInit {
       this.calculateSliderPosition();
     }, timeout);
   }
-  
+
   nextFunc(): void {
     if (this.isInfiniteScroll) {
       this.slideInfinite('forward');
@@ -244,18 +253,73 @@ export class SliderComponent implements OnInit {
     }
   }
 
-
-
   // indicators
   goToSlide(index: number): void {
-    this.currentIndex = this.isInfiniteScroll ? index * this.stepSize + this.numberOfVisibleItems : Math.min(index * this.stepSize, this.maxCurrentIndex);
-    this.isTransitionEnabled = true;
-    this.calculateSliderPosition();
-  }
+  this.currentIndex =this.isInfiniteScroll ? this.numberOfVisibleItems + (index * this.stepSize): Math.min(index * this.stepSize, this.maxCurrentIndex);
+  this.isTransitionEnabled = true;
+  this.calculateSliderPosition();
+}
+
+// Fixed getCurrentIndicator method
   getCurrentIndicator(): number {
-    const baseIndex = this.currentIndex - (this.isInfiniteScroll ? this.numberOfVisibleItems : 0);
-    return Math.floor(baseIndex / this.stepSize);
+  if (this.isInfiniteScroll) {
+    // For infinite scroll, we need to normalize the current index to the original items range
+    const originalLength = this.clonedSliderItems.length;
+    const startOfOriginal = this.numberOfVisibleItems;
+    
+    // Get the actual position within the original items
+    let normalizedIndex = this.currentIndex - startOfOriginal;
+    
+    // Handle wrapping for positions that might be in clones
+    if (normalizedIndex < 0) {
+      // We're in the start clones area
+      normalizedIndex = originalLength + normalizedIndex;
+    } else if (normalizedIndex >= originalLength) {
+      // We're in the end clones area
+      normalizedIndex = normalizedIndex - originalLength;
+    }
+    
+    // Ensure the normalized index is within bounds
+    normalizedIndex = Math.max(0, Math.min(normalizedIndex, originalLength - 1));
+    
+    return Math.floor(normalizedIndex / this.stepSize);
+  } else {
+    // For finite scroll, simple calculation
+    return Math.floor(this.currentIndex / this.stepSize);
   }
+  }
+
+// Alternative more robust implementation
+  getCurrentIndicatorRobust(): number {
+  if (!this.isInfiniteScroll) {
+    return Math.floor(this.currentIndex / this.stepSize);
+  }
+  
+  const originalLength = this.clonedSliderItems.length;
+  const cloneLength = this.numberOfVisibleItems;
+  
+  // Calculate the effective position in the original array
+  let effectiveIndex = this.currentIndex - cloneLength;
+  
+  // Normalize to original array bounds using modulo
+  effectiveIndex = ((effectiveIndex % originalLength) + originalLength) % originalLength;
+  
+  // Calculate which indicator should be active
+  const indicatorIndex = Math.floor(effectiveIndex / this.stepSize);
+  
+  // Ensure we don't exceed the number of indicators
+  return Math.min(indicatorIndex, this.indicatorsLength - 1);
+  }
+
+  // goToSlide(index: number): void {
+  //   this.currentIndex = this.isInfiniteScroll ? index * this.stepSize + this.numberOfVisibleItems : Math.min(index * this.stepSize, this.maxCurrentIndex);
+  //   this.isTransitionEnabled = true;
+  //   this.calculateSliderPosition();
+  // }
+  // getCurrentIndicator(): number {
+  //   const baseIndex = this.currentIndex - (this.isInfiniteScroll ? this.numberOfVisibleItems : 0);
+  //   return Math.floor(baseIndex / this.stepSize);
+  // }
 
   // drag
   private initializeHammer() {
