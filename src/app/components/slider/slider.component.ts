@@ -65,6 +65,7 @@ export class SliderComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['sliderItems'] || changes['sliderOptions']) {
       this.calculateSliderPosition();
+      this.clonedSliderItems = [...this.sliderItems];
       this.stepSize = this.sliderOptions.stepSize || 1;
       this.numberOfVisibleItems = this.sliderOptions.numberOfVisibleItems;
       this.numberOfRows = this.sliderOptions.rows || 1;
@@ -84,7 +85,6 @@ export class SliderComponent implements OnInit {
       this.isRTL = this.sliderOptions.rtl || false;
       this.animationSpeed = this.sliderOptions.animationSpeed || '0.6s';
       this.animation = this.sliderOptions.animation || 'linear';
-      this.clonedSliderItems = [...this.sliderItems];
       this.safeNextButton = this.sliderOptions.nextButton ? this.sanitizer.bypassSecurityTrustHtml(this.sliderOptions.nextButton) : '';
       this.safePrevButton = this.sliderOptions.prevButton ? this.sanitizer.bypassSecurityTrustHtml(this.sliderOptions.prevButton) : '';
       this.isDraggable = this.sliderOptions.isDraggable ?? true;
@@ -227,20 +227,13 @@ export class SliderComponent implements OnInit {
           }, parseFloat(this.animationSpeed) * 1000);
         }
       } else {
-        console.log('current index before', this.currentIndex);
-
         this.currentIndex += step;
-        console.log('current index after', this.currentIndex);
-
         this.isTransitionEnabled = true;
         this.calculateSliderPosition();
-
-        if (this.currentIndex >= this.sliderItems.length - this.numberOfVisibleItems) {
+       if (this.currentIndex > this.sliderItems.length - this.numberOfVisibleItems) {
           setTimeout(() => {
             this.isTransitionEnabled = false;
-            this.currentIndex = this.numberOfVisibleItems;
-            console.log('current index finaaal', this.currentIndex);
-
+            this.currentIndex = this.numberOfVisibleItems -1;
             this.calculateSliderPosition();
           }, parseFloat(this.animationSpeed) * 1000);
         }
@@ -282,10 +275,6 @@ export class SliderComponent implements OnInit {
           setTimeout(() => {
             this.isTransitionEnabled = false;
             this.currentIndex = this.sliderItems.length - this.numberOfVisibleItems * this.stepSize;
-            console.log('current index finaaal', this.currentIndex);
-            // if (this.currentIndex < this.numberOfVisibleItems) {
-            //   this.currentIndex = this.numberOfVisibleItems;
-            // }
             this.calculateSliderPosition();
           }, parseFloat(this.animationSpeed) * 1000);
         }
