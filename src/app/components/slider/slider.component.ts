@@ -211,7 +211,7 @@ export class SliderComponent implements OnInit {
   }
   nextFunc(): void {
     if (this.isInfiniteScroll) {
-      this.slideWithInfinite(true);
+      this.slideInfinite(true);
     } else {
       this.slideFinite(true);
     }
@@ -219,13 +219,13 @@ export class SliderComponent implements OnInit {
 
   prevFunc(): void {
     if (this.isInfiniteScroll) {
-      this.slideWithInfinite(false);
+      this.slideInfinite(false);
     } else {
       this.slideFinite(false)
     }
   }
 
-  slideWithInfinite(forward: boolean): void {
+  slideInfinite(forward: boolean): void {
     this.currentIndex += forward ? this.stepSize : -this.stepSize;
     this.isTransitionEnabled = true;
     this.calculateSliderPosition();
