@@ -198,9 +198,10 @@ export class SliderComponent implements OnInit {
 
     this.cdr.detectChanges();
   }
-  slideFinite(forward: boolean): void {
+
+  slideFinite(direction:  'forward' | 'backward'): void {
     const dir = this.isRTL ? -1 : 1;
-    const movement = forward ? 1 : -1
+    const movement = direction ==='forward' ? 1 : -1
     const newIndex = this.currentIndex + (dir * this.stepSize * movement);
     if (newIndex >= 0 && newIndex <= this.maxCurrentIndex) {
       this.currentIndex = newIndex;
@@ -208,8 +209,9 @@ export class SliderComponent implements OnInit {
     }
 
   }
-    slideInfinite(forward: boolean): void {
-    const step = (this.isRTL ? -1 : 1) * (forward ? 1 : -1) * this.stepSize;
+  slideInfinite(direction: 'forward' | 'backward'): void {
+    const dir = direction === 'forward' ? 1 : -1;
+    const step = (this.isRTL ? -1 : 1) * dir * this.stepSize;
     this.currentIndex += step;
     this.isTransitionEnabled = true;
     this.calculateSliderPosition();
@@ -225,19 +227,20 @@ export class SliderComponent implements OnInit {
       this.calculateSliderPosition();
     }, timeout);
   }
+  
   nextFunc(): void {
     if (this.isInfiniteScroll) {
-      this.slideInfinite(true);
+      this.slideInfinite('forward');
     } else {
-      this.slideFinite(true);
+      this.slideFinite('forward');
     }
   }
 
   prevFunc(): void {
     if (this.isInfiniteScroll) {
-      this.slideInfinite(false);
+      this.slideInfinite('backward');
     } else {
-      this.slideFinite(false)
+      this.slideFinite('backward')
     }
   }
 
