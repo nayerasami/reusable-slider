@@ -232,7 +232,7 @@ export class SliderComponent implements OnInit {
     setTimeout(() => {
       this.isTransitionEnabled = false;
       if (forward && this.currentIndex >= this.sliderItems.length -  this.numberOfVisibleItems) {
-        this.currentIndex =  this.numberOfVisibleItems + (this.clonedSliderItems.length % this.stepSize == 0 ? 0 : (this.currentIndex - this.numberOfVisibleItems - this.clonedSliderItems.length));
+        this.currentIndex = (this.currentIndex - this.clonedSliderItems.length);
       } else if (!forward && this.currentIndex <  this.numberOfVisibleItems) {
         this.currentIndex = this.sliderItems.length -  this.numberOfVisibleItems - this.stepSize;
       }
