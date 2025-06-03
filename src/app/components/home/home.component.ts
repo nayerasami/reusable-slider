@@ -44,7 +44,7 @@ export class HomeComponent {
     numberOfVisibleItems: 4,
     stepSize:3,
     //spaceBetween:50,
-   // rtl: true,
+    rtl: true,
     animation: 'ease-in-out',
     animationSpeed: '0.8s',
     rows:1

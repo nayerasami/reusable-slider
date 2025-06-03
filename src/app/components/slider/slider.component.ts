@@ -209,15 +209,16 @@ export class SliderComponent implements OnInit {
 
   }
     slideInfinite(forward: boolean): void {
-    this.currentIndex += forward ? this.stepSize : -this.stepSize;
+    const step = (this.isRTL ? -1 : 1) * (forward ? 1 : -1) * this.stepSize;
+    this.currentIndex += step;
     this.isTransitionEnabled = true;
     this.calculateSliderPosition();
     const timeout = parseFloat(this.animationSpeed) * 1000;
     setTimeout(() => {
       this.isTransitionEnabled = false;
-      if (forward && this.currentIndex >= this.sliderItems.length -  this.numberOfVisibleItems) {
+      if ( this.currentIndex >= this.sliderItems.length -  this.numberOfVisibleItems) {
         this.currentIndex = this.currentIndex - this.clonedSliderItems.length;
-      } else if (!forward && this.currentIndex <  this.numberOfVisibleItems) {
+      } else if ( this.currentIndex <  this.numberOfVisibleItems) {
         const stepsIntoStartClones = this.numberOfVisibleItems - this.currentIndex;
         this.currentIndex = this.numberOfVisibleItems + this.clonedSliderItems.length - stepsIntoStartClones;
       }
