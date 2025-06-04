@@ -39,7 +39,7 @@ export class HomeComponent {
     autoplay: false,
     autoplaySpeed: 3000,
     indicators: true,
-    infiniteScroll: false,
+    infiniteScroll: true,
     isDraggable: false,
     numberOfVisibleItems: 4,
     stepSize:3,

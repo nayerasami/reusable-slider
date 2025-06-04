@@ -105,19 +105,19 @@ export class SliderComponent implements OnInit {
 
   calculateIndicators() {
     if (this.isInfiniteScroll) {
-    // For infinite scroll, indicators represent positions in the original items only
-    const originalLength = this.clonedSliderItems.length;
-    const totalSlides = Math.ceil(originalLength / this.stepSize);
-    this.indicatorsLength = totalSlides;
-    this.indicatorsArray = Array.from({ length: this.indicatorsLength }, (_, i) => i);
-    // maxCurrentIndex is not used in infinite scroll, but set it for consistency
-    this.maxCurrentIndex = originalLength - this.numberOfVisibleItems;
-  } else {
-    const totalSlides = (this.clonedSliderItems.length / this.numberOfRows - this.numberOfVisibleItems) / this.stepSize + 1;
-    this.indicatorsLength = Math.ceil(totalSlides);
-    this.indicatorsArray = Array.from({ length: this.indicatorsLength }, (_, i) => i);
-    this.maxCurrentIndex = (this.sliderItems.length - 1) / this.numberOfRows - (this.numberOfVisibleItems - this.stepSize);
-  }
+      // For infinite scroll, indicators represent positions in the original items only
+      const originalLength = this.clonedSliderItems.length;
+      const totalSlides = Math.ceil(originalLength / this.stepSize);
+      this.indicatorsLength = totalSlides;
+      this.indicatorsArray = Array.from({ length: this.indicatorsLength }, (_, i) => i);
+      // maxCurrentIndex is not used in infinite scroll, but set it for consistency
+      this.maxCurrentIndex = originalLength - this.numberOfVisibleItems;
+    } else {
+      const totalSlides = (this.clonedSliderItems.length / this.numberOfRows - this.numberOfVisibleItems) / this.stepSize + 1;
+      this.indicatorsLength = Math.ceil(totalSlides);
+      this.indicatorsArray = Array.from({ length: this.indicatorsLength }, (_, i) => i);
+      this.maxCurrentIndex = (this.sliderItems.length - 1) / this.numberOfRows - (this.numberOfVisibleItems - this.stepSize);
+    }
   }
   handleInfiniteScrollSliderItems() {
     if (!this.isInfiniteScroll) {
@@ -126,10 +126,10 @@ export class SliderComponent implements OnInit {
       this.translateX = 0;
     } else {
       this.sliderItems = [...this.clonedSliderItems];
-      const startClone = this.sliderItems.slice(0,  this.numberOfVisibleItems);
+      const startClone = this.sliderItems.slice(0, this.numberOfVisibleItems);
       const endClone = this.sliderItems.slice(- this.numberOfVisibleItems);
       this.sliderItems = [...endClone, ...this.sliderItems, ...startClone];
-      this.currentIndex =  this.numberOfVisibleItems;
+      this.currentIndex = this.numberOfVisibleItems;
       this.translateX = -(this.currentIndex * (100 / this.numberOfVisibleItems));
     }
   }
@@ -208,9 +208,9 @@ export class SliderComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  slideFinite(direction:  'forward' | 'backward'): void {
+  slideFinite(direction: 'forward' | 'backward'): void {
     const dir = this.isRTL ? -1 : 1;
-    const movement = direction ==='forward' ? 1 : -1
+    const movement = direction === 'forward' ? 1 : -1
     const newIndex = this.currentIndex + (dir * this.stepSize * movement);
     if (newIndex >= 0 && newIndex <= this.maxCurrentIndex) {
       this.currentIndex = newIndex;
@@ -227,9 +227,9 @@ export class SliderComponent implements OnInit {
     const timeout = parseFloat(this.animationSpeed) * 1000;
     setTimeout(() => {
       this.isTransitionEnabled = false;
-      if ( this.currentIndex >= this.sliderItems.length -  this.numberOfVisibleItems) {
+      if (this.currentIndex >= this.sliderItems.length - this.numberOfVisibleItems) {
         this.currentIndex = this.currentIndex - this.clonedSliderItems.length;
-      } else if ( this.currentIndex <  this.numberOfVisibleItems) {
+      } else if (this.currentIndex < this.numberOfVisibleItems) {
         const stepsIntoStartClones = this.numberOfVisibleItems - this.currentIndex;
         this.currentIndex = this.numberOfVisibleItems + this.clonedSliderItems.length - stepsIntoStartClones;
       }
@@ -255,71 +255,25 @@ export class SliderComponent implements OnInit {
 
   // indicators
   goToSlide(index: number): void {
-  this.currentIndex =this.isInfiniteScroll ? this.numberOfVisibleItems + (index * this.stepSize): Math.min(index * this.stepSize, this.maxCurrentIndex);
-  this.isTransitionEnabled = true;
-  this.calculateSliderPosition();
-}
+    this.currentIndex = this.isInfiniteScroll ? this.numberOfVisibleItems + (index * this.stepSize) : Math.min(index * this.stepSize, this.maxCurrentIndex);
+    this.isTransitionEnabled = true;
+    this.calculateSliderPosition();
+  }
 
-// Fixed getCurrentIndicator method
   getCurrentIndicator(): number {
-  if (this.isInfiniteScroll) {
-    // For infinite scroll, we need to normalize the current index to the original items range
-    const originalLength = this.clonedSliderItems.length;
-    const startOfOriginal = this.numberOfVisibleItems;
-    
-    // Get the actual position within the original items
-    let normalizedIndex = this.currentIndex - startOfOriginal;
-    
-    // Handle wrapping for positions that might be in clones
-    if (normalizedIndex < 0) {
-      // We're in the start clones area
-      normalizedIndex = originalLength + normalizedIndex;
-    } else if (normalizedIndex >= originalLength) {
-      // We're in the end clones area
-      normalizedIndex = normalizedIndex - originalLength;
+    if (!this.isInfiniteScroll) {
+      return Math.floor(this.currentIndex / this.stepSize);
     }
-    
-    // Ensure the normalized index is within bounds
-    normalizedIndex = Math.max(0, Math.min(normalizedIndex, originalLength - 1));
-    
+    let normalizedIndex = this.currentIndex - this.numberOfVisibleItems;
+    if (normalizedIndex < 0) {
+      normalizedIndex = this.clonedSliderItems.length + normalizedIndex;
+    } else if (normalizedIndex >= this.clonedSliderItems.length) {
+      normalizedIndex = normalizedIndex -this.clonedSliderItems.length;
+    }
+    normalizedIndex = Math.max(0, Math.min(normalizedIndex,this.clonedSliderItems.length - 1));
     return Math.floor(normalizedIndex / this.stepSize);
-  } else {
-    // For finite scroll, simple calculation
-    return Math.floor(this.currentIndex / this.stepSize);
-  }
   }
 
-// Alternative more robust implementation
-  getCurrentIndicatorRobust(): number {
-  if (!this.isInfiniteScroll) {
-    return Math.floor(this.currentIndex / this.stepSize);
-  }
-  
-  const originalLength = this.clonedSliderItems.length;
-  const cloneLength = this.numberOfVisibleItems;
-  
-  // Calculate the effective position in the original array
-  let effectiveIndex = this.currentIndex - cloneLength;
-  
-  // Normalize to original array bounds using modulo
-  effectiveIndex = ((effectiveIndex % originalLength) + originalLength) % originalLength;
-  
-  // Calculate which indicator should be active
-  const indicatorIndex = Math.floor(effectiveIndex / this.stepSize);
-  
-  // Ensure we don't exceed the number of indicators
-  return Math.min(indicatorIndex, this.indicatorsLength - 1);
-  }
-
-  // goToSlide(index: number): void {
-  //   this.currentIndex = this.isInfiniteScroll ? index * this.stepSize + this.numberOfVisibleItems : Math.min(index * this.stepSize, this.maxCurrentIndex);
-  //   this.isTransitionEnabled = true;
-  //   this.calculateSliderPosition();
-  // }
-  // getCurrentIndicator(): number {
-  //   const baseIndex = this.currentIndex - (this.isInfiniteScroll ? this.numberOfVisibleItems : 0);
-  //   return Math.floor(baseIndex / this.stepSize);
-  // }
 
   // drag
   private initializeHammer() {
