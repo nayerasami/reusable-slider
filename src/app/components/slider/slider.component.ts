@@ -233,6 +233,7 @@ export class SliderComponent implements OnInit {
     }
 
   }
+
   slideInfinite(direction: 'forward' | 'backward'): void {
     const dir = direction === 'forward' ? 1 : -1;
     const step = (this.isRTL ? -1 : 1) * dir * this.stepSize;
@@ -287,7 +288,6 @@ export class SliderComponent implements OnInit {
     normalizedIndex = Math.max(0, Math.min(normalizedIndex, this.clonedSliderItems.length - 1));
     return Math.floor(normalizedIndex / this.stepSize);
   }
-
 
   // drag
   private initializeHammer() {
@@ -348,12 +348,13 @@ export class SliderComponent implements OnInit {
 
     this.isDragging = false;
     this.isTransitionEnabled = true;
-
-    const containerWidth = this.numberOfRows > 1 ? this.multiRowSlider.nativeElement.offsetWidth : this.singleRowSlider.nativeElement.offsetWidth;
-
     const dragDistance = Math.abs(event.deltaX);
-    const shouldMove = dragDistance > this.dragThreshold;
-
+    let shouldMove = false;
+    if (this.isInfiniteScroll) {
+      shouldMove = Math.abs(dragDistance) > this.dragThreshold;
+    } else {
+      shouldMove = this.currentIndex <= this.maxCurrentIndex - this.stepSize;
+    }
     if (shouldMove) {
       if (this.isRTL) {
         if (event.deltaX > 0) {
