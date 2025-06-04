@@ -96,21 +96,30 @@ export class SliderComponent implements OnInit {
 
     }
     if (changes['responsiveOptions']) {
-      this.sortedResponsiveOptons = this.responsiveOptions.sort((a: any, b: any) => parseInt(a.breakpoint.replace('px', ''), 10) - parseInt(b.breakpoint.replace('px', ''), 10));
+      if( this.responsiveOptions && this.responsiveOptions.length === 0) {
+         this.sortedResponsiveOptons = this.responsiveOptions.sort((a: any, b: any) => parseInt(a.breakpoint.replace('px', ''), 10) - parseInt(b.breakpoint.replace('px', ''), 10));
       this.largestBreakpoint = this.sortedResponsiveOptons[this.sortedResponsiveOptons.length - 1];
       this.applyResponsiveOptions();
+      }else{
+        this.setDefaultSliderSettings()
+      }
       this.calculateSliderPosition();
+
     }
   }
-
+  setDefaultSliderSettings(): void {
+    if (this.sliderOptions) {
+      this.numberOfVisibleItems = this.sliderOptions.numberOfVisibleItems || 4;
+      this.stepSize = this.sliderOptions.stepSize || 1;
+      this.calculateIndicators();
+    }
+  }
   calculateIndicators() {
     if (this.isInfiniteScroll) {
-      // For infinite scroll, indicators represent positions in the original items only
       const originalLength = this.clonedSliderItems.length;
       const totalSlides = Math.ceil(originalLength / this.stepSize);
       this.indicatorsLength = totalSlides;
       this.indicatorsArray = Array.from({ length: this.indicatorsLength }, (_, i) => i);
-      // maxCurrentIndex is not used in infinite scroll, but set it for consistency
       this.maxCurrentIndex = originalLength - this.numberOfVisibleItems;
     } else {
       const totalSlides = (this.clonedSliderItems.length / this.numberOfRows - this.numberOfVisibleItems) / this.stepSize + 1;
@@ -183,7 +192,6 @@ export class SliderComponent implements OnInit {
         };
         this.numberOfVisibleItems = config.numVisible;
         this.stepSize = config.numScroll;
-        // this.maxCurrentIndex = (this.sliderItems.length - 1) / this.numberOfRows - (config.numVisible - config.numScroll);
         this.calculateIndicators()
         configFound = true;
         break;
@@ -193,11 +201,11 @@ export class SliderComponent implements OnInit {
       this.sliderOptions = {
         ...this.sliderOptions,
         numberOfVisibleItems: this.largestBreakpoint.numVisible,
+        stepSize:this.largestBreakpoint.numScroll,
       };
       this.numberOfVisibleItems = this.largestBreakpoint.numVisible;
       this.stepSize = this.largestBreakpoint.numScroll || 1;
       this.calculateIndicators()
-      //this.maxCurrentIndex = (this.sliderItems.length - 1) / this.numberOfRows - (this.largestBreakpoint.numVisible - this.stepSize);
     }
     // Reset current index if it exceeds the new maximum
     if (this.currentIndex > this.maxCurrentIndex) {
@@ -227,11 +235,11 @@ export class SliderComponent implements OnInit {
     const timeout = parseFloat(this.animationSpeed) * 1000;
     setTimeout(() => {
       this.isTransitionEnabled = false;
-      if (this.currentIndex >= this.sliderItems.length - this.numberOfVisibleItems) {
+      if (this.currentIndex >= this.sliderItems.length - (this.numberOfVisibleItems * this.numberOfRows)) {
         this.currentIndex = this.currentIndex - this.clonedSliderItems.length;
-      } else if (this.currentIndex < this.numberOfVisibleItems) {
-        const stepsIntoStartClones = this.numberOfVisibleItems - this.currentIndex;
-        this.currentIndex = this.numberOfVisibleItems + this.clonedSliderItems.length - stepsIntoStartClones;
+      } else if (this.currentIndex < (this.numberOfVisibleItems * this.numberOfRows)) {
+        const stepsIntoStartClones = (this.numberOfVisibleItems * this.numberOfRows) - this.currentIndex;
+        this.currentIndex = (this.numberOfVisibleItems * this.numberOfRows) + this.clonedSliderItems.length - stepsIntoStartClones;
       }
       this.calculateSliderPosition();
     }, timeout);
@@ -268,9 +276,9 @@ export class SliderComponent implements OnInit {
     if (normalizedIndex < 0) {
       normalizedIndex = this.clonedSliderItems.length + normalizedIndex;
     } else if (normalizedIndex >= this.clonedSliderItems.length) {
-      normalizedIndex = normalizedIndex -this.clonedSliderItems.length;
+      normalizedIndex = normalizedIndex - this.clonedSliderItems.length;
     }
-    normalizedIndex = Math.max(0, Math.min(normalizedIndex,this.clonedSliderItems.length - 1));
+    normalizedIndex = Math.max(0, Math.min(normalizedIndex, this.clonedSliderItems.length - 1));
     return Math.floor(normalizedIndex / this.stepSize);
   }
 
@@ -335,9 +343,9 @@ export class SliderComponent implements OnInit {
     if (!this.isDragging || !this.isDraggable) return;
 
     this.isDragging = false;
-    this.isTransitionEnabled = true; // Re-enable transitions
+    this.isTransitionEnabled = true;
     const containerWidth = this.numberOfRows > 1 ? this.multiRowSlider.nativeElement.offsetWidth : this.singleRowSlider.nativeElement.offsetWidth; const dragPercentage = Math.abs(event.deltaX) / containerWidth;
-    const stepWidth = 100 / this.numberOfVisibleItems; // Width of one visible item in percentage
+    const stepWidth = 100 / this.numberOfVisibleItems;
     const stepsToMove = Math.ceil((dragPercentage * 100) / stepWidth);
     const dragDistance = Math.abs(event.deltaX);
     const shouldMove = dragDistance > this.dragThreshold && stepsToMove > 0;
