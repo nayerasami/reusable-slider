@@ -14,7 +14,7 @@ export interface SliderOptions {
   infiniteScroll?: boolean;
   isDraggable?:boolean;
   stepSize?:number;
-  numberOfVisibleItems:number;
+  numberOfVisibleItems?:number;
   spaceBetween?:number;
   rtl?:boolean;
   animation?:'linear' | 'ease-in-out' | 'ease-out' | 'ease-in' | 'ease';

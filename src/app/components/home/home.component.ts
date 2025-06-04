@@ -14,8 +14,8 @@ export class HomeComponent {
   responsiveOptions: ResponsiveConfig[] = [
     {
       breakpoint: '1400px',
-      numVisible: 3,
-      numScroll:1
+      numVisible:4,
+      numScroll:3
     },
     {
       breakpoint: '1199px',
@@ -39,12 +39,12 @@ export class HomeComponent {
     autoplay: false,
     autoplaySpeed: 3000,
     indicators: true,
-    infiniteScroll: true,
-    isDraggable: false,
-    numberOfVisibleItems: 3,
-    stepSize: 1,
+    infiniteScroll: false,
+   // isDraggable: false,
+   // numberOfVisibleItems: 4,
+   // stepSize:3,
     //spaceBetween:50,
-    rtl: false,
+   // rtl: true,
     animation: 'ease-in-out',
     animationSpeed: '0.8s',
     rows:1
@@ -61,13 +61,13 @@ export class HomeComponent {
     { id: 6, name: 'slide 6' },
     { id: 7, name: 'slide 7' },
     { id: 8, name: 'slide 8' },
-    // { id: 9, name: 'slide 9' },
-    // { id: 10, name: 'slide 10' },
-    // { id: 11, name: 'slide 11' },
-    // { id: 12, name: 'slide 12' },
-    // { id: 13, name: 'slide 13' },
-    // { id: 14, name: 'slide 14' },
-    // { id: 15, name: 'slide 15' },
+    //{ id: 9, name: 'slide 9' },
+ //  { id: 10, name: 'slide 10' },
+  //   { id: 11, name: 'slide 11' },
+  //  { id: 12, name: 'slide 12' },
+  //   { id: 13, name: 'slide 13' },
+  //   { id: 14, name: 'slide 14' },
+  //   { id: 15, name: 'slide 15' },
   ]
 
 
