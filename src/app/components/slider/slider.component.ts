@@ -322,7 +322,7 @@ export class SliderComponent implements OnInit {
   }
 
   private onDragStart(event: any): void {
-    if (!this.isDraggable) return;
+    if (!this.isDraggable || this.sliderItems.length <= this.numberOfVisibleItems ) return;
     this.isDragging = true;
     this.dragStartTranslateX = this.translateX;
     if (this.sliderOptions.autoplay) {
@@ -332,7 +332,7 @@ export class SliderComponent implements OnInit {
   }
 
   private onDragMove(event: any): void {
-    if (!this.isDragging || !this.isDraggable) return;
+    if (!this.isDragging || !this.isDraggable||this.sliderItems.length <= this.numberOfVisibleItems ) return;
     const containerWidth = this.numberOfRows > 1 ? this.multiRowSlider.nativeElement.offsetWidth : this.singleRowSlider.nativeElement.offsetWidth;
     const dragPercentage = (event.deltaX / containerWidth) * 100;
     if (this.isRTL) {
@@ -344,7 +344,7 @@ export class SliderComponent implements OnInit {
   }
 
   private onDragEnd(event: any): void {
-    if (!this.isDragging || !this.isDraggable) return;
+    if (!this.isDragging || !this.isDraggable || this.sliderItems.length <= this.numberOfVisibleItems) return;
 
     this.isDragging = false;
     this.isTransitionEnabled = true;
