@@ -78,7 +78,27 @@ export class SliderComponent implements OnInit {
       this.rowsArray = Array.from({ length: this.sliderOptions.rows }, (_, i) => i);
       this.calculateIndicators();
       this.handleInfiniteScrollSliderItems();
+      this.handleMoreThanOneRowSliderItems();
 
+      if (this.sliderOptions.autoplay) {
+        this.startAutoplay();
+      }
+
+    }
+    if (changes['responsiveOptions']) {
+      if (this.responsiveOptions && this.responsiveOptions.length === 0) {
+        this.sortedResponsiveOptons = this.responsiveOptions.sort((a: any, b: any) => parseInt(a.breakpoint.replace('px', ''), 10) - parseInt(b.breakpoint.replace('px', ''), 10));
+        this.largestBreakpoint = this.sortedResponsiveOptons[this.sortedResponsiveOptons.length - 1];
+        this.applyResponsiveOptions();
+      } else {
+        this.setDefaultSliderSettings()
+      }
+      this.calculateSliderPosition();
+
+    }
+  }
+  handleMoreThanOneRowSliderItems() {
+    if (this.numberOfRows > 1) {
       for (let key = 0; key < this.sliderOptions.rows; key++) {
         this.customSliderItems[key] = [];
       }
@@ -90,23 +110,10 @@ export class SliderComponent implements OnInit {
           }
         }
       }
-      if (this.sliderOptions.autoplay) {
-        this.startAutoplay();
-      }
-
-    }
-    if (changes['responsiveOptions']) {
-      if( this.responsiveOptions && this.responsiveOptions.length === 0) {
-         this.sortedResponsiveOptons = this.responsiveOptions.sort((a: any, b: any) => parseInt(a.breakpoint.replace('px', ''), 10) - parseInt(b.breakpoint.replace('px', ''), 10));
-      this.largestBreakpoint = this.sortedResponsiveOptons[this.sortedResponsiveOptons.length - 1];
-      this.applyResponsiveOptions();
-      }else{
-        this.setDefaultSliderSettings()
-      }
-      this.calculateSliderPosition();
-
+      console.log(this.customSliderItems, 'customSliderItems');
     }
   }
+
   setDefaultSliderSettings(): void {
     if (this.sliderOptions) {
       this.numberOfVisibleItems = this.sliderOptions.numberOfVisibleItems || 4;
@@ -201,7 +208,7 @@ export class SliderComponent implements OnInit {
       this.sliderOptions = {
         ...this.sliderOptions,
         numberOfVisibleItems: this.largestBreakpoint.numVisible,
-        stepSize:this.largestBreakpoint.numScroll,
+        stepSize: this.largestBreakpoint.numScroll,
       };
       this.numberOfVisibleItems = this.largestBreakpoint.numVisible;
       this.stepSize = this.largestBreakpoint.numScroll || 1;
@@ -235,11 +242,10 @@ export class SliderComponent implements OnInit {
     const timeout = parseFloat(this.animationSpeed) * 1000;
     setTimeout(() => {
       this.isTransitionEnabled = false;
-      if (this.currentIndex >= this.sliderItems.length - (this.numberOfVisibleItems * this.numberOfRows)) {
+      if (this.currentIndex >= this.sliderItems.length - this.numberOfVisibleItems) {
         this.currentIndex = this.currentIndex - this.clonedSliderItems.length;
-      } else if (this.currentIndex < (this.numberOfVisibleItems * this.numberOfRows)) {
-        const stepsIntoStartClones = (this.numberOfVisibleItems * this.numberOfRows) - this.currentIndex;
-        this.currentIndex = (this.numberOfVisibleItems * this.numberOfRows) + this.clonedSliderItems.length - stepsIntoStartClones;
+      } else if (this.currentIndex < this.numberOfVisibleItems) {
+        this.currentIndex = this.numberOfVisibleItems + this.clonedSliderItems.length - (this.numberOfVisibleItems - this.currentIndex);
       }
       this.calculateSliderPosition();
     }, timeout);
@@ -327,10 +333,7 @@ export class SliderComponent implements OnInit {
 
   private onDragMove(event: any): void {
     if (!this.isDragging || !this.isDraggable) return;
-    const containerWidth =
-      this.numberOfRows > 1
-        ? this.multiRowSlider.nativeElement.offsetWidth
-        : this.singleRowSlider.nativeElement.offsetWidth;
+    const containerWidth = this.numberOfRows > 1 ? this.multiRowSlider.nativeElement.offsetWidth : this.singleRowSlider.nativeElement.offsetWidth;
     const dragPercentage = (event.deltaX / containerWidth) * 100;
     if (this.isRTL) {
       this.translateX = this.dragStartTranslateX - dragPercentage;
@@ -339,44 +342,36 @@ export class SliderComponent implements OnInit {
     }
     this.cdr.detectChanges();
   }
+
   private onDragEnd(event: any): void {
     if (!this.isDragging || !this.isDraggable) return;
 
     this.isDragging = false;
     this.isTransitionEnabled = true;
-    const containerWidth = this.numberOfRows > 1 ? this.multiRowSlider.nativeElement.offsetWidth : this.singleRowSlider.nativeElement.offsetWidth; const dragPercentage = Math.abs(event.deltaX) / containerWidth;
-    const stepWidth = 100 / this.numberOfVisibleItems;
-    const stepsToMove = Math.ceil((dragPercentage * 100) / stepWidth);
+
+    const containerWidth = this.numberOfRows > 1 ? this.multiRowSlider.nativeElement.offsetWidth : this.singleRowSlider.nativeElement.offsetWidth;
+
     const dragDistance = Math.abs(event.deltaX);
-    const shouldMove = dragDistance > this.dragThreshold && stepsToMove > 0;
+    const shouldMove = dragDistance > this.dragThreshold;
 
     if (shouldMove) {
-      let targetIndex = this.currentIndex;
-
       if (this.isRTL) {
         if (event.deltaX > 0) {
-          targetIndex = Math.min(
-            this.currentIndex + this.stepSize,
-            this.maxCurrentIndex
-          );
+          this.nextFunc();
         } else {
-          targetIndex = Math.max(this.currentIndex - this.stepSize, 0);
+          this.prevFunc();
         }
       } else {
         if (event.deltaX > 0) {
-          targetIndex = Math.max(this.currentIndex - this.stepSize, 0);
+          this.prevFunc();
         } else {
-          targetIndex = Math.min(
-            this.currentIndex + this.stepSize,
-            this.maxCurrentIndex
-          );
+          this.nextFunc();
         }
       }
-      this.currentIndex = targetIndex;
-      this.calculateSliderPosition();
     } else {
       this.calculateSliderPosition();
     }
+
     if (this.sliderOptions.autoplay) {
       this.startAutoplay();
     }
