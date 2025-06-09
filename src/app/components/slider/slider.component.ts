@@ -20,15 +20,15 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import Hammer from 'hammerjs';
 @Component({
   selector: 'app-slider',
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './slider.component.html',
-  styleUrl: './slider.component.css',
+  styleUrl: './slider.component.scss',
 })
 export class SliderComponent implements OnInit {
-  constructor(private cdr: ChangeDetectorRef, private sanitizer: DomSanitizer) { }
+  constructor( private cdr: ChangeDetectorRef, private sanitizer: DomSanitizer) {}
   @ContentChild('itemTemplate') itemTemplate!: TemplateRef<any>;
-  @ViewChild('singleRowSlider', { static: false }) singleRowSlider!: ElementRef;
-  @ViewChild('multiRowSlider', { static: false }) multiRowSlider!: ElementRef;
+  @ViewChild('rowSlider', { static: false }) rowSlider!: ElementRef;
   @Input() responsiveOptions: any;
   @Input() sliderOptions: any;
   @Input() sliderItems: any[] = [];
@@ -51,6 +51,7 @@ export class SliderComponent implements OnInit {
   safePrevButton: any;
   safeNextButton: any;
   customSliderItems: any = {};
+  clonedCustomSliderItems:any ={};
   numberOfRows: number = 1;
   rowsArray: any[] = [];
   isTransitionEnabled = true;
@@ -72,10 +73,10 @@ export class SliderComponent implements OnInit {
       this.animationSpeed = this.sliderOptions.animationSpeed ?? '0.6s';
       this.animation = this.sliderOptions.animation ?? 'linear';
       this.safeNextButton = this.sliderOptions.nextButton ? this.sanitizer.bypassSecurityTrustHtml(this.sliderOptions.nextButton) : '';
-      this.safePrevButton = this.sliderOptions.prevButton ? this.sanitizer.bypassSecurityTrustHtml(this.sliderOptions.prevButton) : '';
+      this.safePrevButton = this.sliderOptions.prevButton ? this.sanitizer.bypassSecurityTrustHtml(this.sliderOptions.prevButton): '';
       this.isDraggable = this.sliderOptions.isDraggable ?? true;
       this.isInfiniteScroll = this.sliderOptions.infiniteScroll ?? false;
-      this.rowsArray = Array.from({ length: this.sliderOptions.rows }, (_, i) => i);
+      this.rowsArray = Array.from( { length: this.sliderOptions.rows },(_, i) => i);
       this.calculateIndicators();
       this.handleInfiniteScrollSliderItems();
       this.handleMoreThanOneRowSliderItems();
@@ -83,18 +84,16 @@ export class SliderComponent implements OnInit {
       if (this.sliderOptions.autoplay) {
         this.startAutoplay();
       }
-
     }
     if (changes['responsiveOptions']) {
       if (this.responsiveOptions && this.responsiveOptions.length === 0) {
-        this.sortedResponsiveOptons = this.responsiveOptions.sort((a: any, b: any) => parseInt(a.breakpoint.replace('px', ''), 10) - parseInt(b.breakpoint.replace('px', ''), 10));
+        this.sortedResponsiveOptons = this.responsiveOptions.sort((a: any, b: any) => parseInt(a.breakpoint.replace('px', ''), 10) - parseInt(b.breakpoint.replace('px', ''), 10) );
         this.largestBreakpoint = this.sortedResponsiveOptons[this.sortedResponsiveOptons.length - 1];
         this.applyResponsiveOptions();
       } else {
-        this.setDefaultSliderSettings()
+        this.setDefaultSliderSettings();
       }
       this.calculateSliderPosition();
-
     }
   }
   handleMoreThanOneRowSliderItems() {
@@ -102,7 +101,7 @@ export class SliderComponent implements OnInit {
       for (let key = 0; key < this.sliderOptions.rows; key++) {
         this.customSliderItems[key] = [];
       }
-      for (let i = 0; i < this.sliderItems.length; i += this.sliderOptions.rows) {
+      for ( let i = 0; i < this.sliderItems.length; i += this.sliderOptions.rows ) {
         for (let j = 0; j < this.sliderOptions.rows; j++) {
           const item = this.sliderItems[i + j];
           if (item !== undefined) {
@@ -110,10 +109,13 @@ export class SliderComponent implements OnInit {
           }
         }
       }
-      console.log(this.customSliderItems, 'customSliderItems');
+   
+    this.clonedCustomSliderItems = {};
+    for (let key in this.customSliderItems) {
+      this.clonedCustomSliderItems[key] = [...this.customSliderItems[key]];
+    } 
     }
   }
-
   setDefaultSliderSettings(): void {
     if (this.sliderOptions) {
       this.numberOfVisibleItems = this.sliderOptions.numberOfVisibleItems || 4;
@@ -126,29 +128,75 @@ export class SliderComponent implements OnInit {
       const originalLength = this.clonedSliderItems.length;
       const totalSlides = Math.ceil(originalLength / this.stepSize);
       this.indicatorsLength = totalSlides;
-      this.indicatorsArray = Array.from({ length: this.indicatorsLength }, (_, i) => i);
+      this.indicatorsArray = Array.from( { length: this.indicatorsLength }, (_, i) => i);
       this.maxCurrentIndex = originalLength - this.numberOfVisibleItems;
     } else {
       const totalSlides = (this.clonedSliderItems.length / this.numberOfRows - this.numberOfVisibleItems) / this.stepSize + 1;
       this.indicatorsLength = Math.ceil(totalSlides);
-      this.indicatorsArray = Array.from({ length: this.indicatorsLength }, (_, i) => i);
-      this.maxCurrentIndex = (this.sliderItems.length - 1) / this.numberOfRows - (this.numberOfVisibleItems - this.stepSize);
+      this.indicatorsArray = Array.from( { length: this.indicatorsLength },(_, i) => i );
+      this.maxCurrentIndex =(this.sliderItems.length - 1) / this.numberOfRows - (this.numberOfVisibleItems - this.stepSize);
     }
   }
   handleInfiniteScrollSliderItems() {
-    if (!this.isInfiniteScroll) {
+   
+  if(this.numberOfRows == 1 ){
+     if (!this.isInfiniteScroll) {
       this.sliderItems = [...this.clonedSliderItems];
       this.currentIndex = 0;
       this.translateX = 0;
-    } else {
+      return
+    } 
+    if(this.sliderItems.length >= this.numberOfVisibleItems){
       this.sliderItems = [...this.clonedSliderItems];
       const startClone = this.sliderItems.slice(0, this.numberOfVisibleItems);
-      const endClone = this.sliderItems.slice(- this.numberOfVisibleItems);
+      const endClone = this.sliderItems.slice(-this.numberOfVisibleItems);
       this.sliderItems = [...endClone, ...this.sliderItems, ...startClone];
       this.currentIndex = this.numberOfVisibleItems;
-      this.translateX = -(this.currentIndex * (100 / this.numberOfVisibleItems));
-    }
+      this.translateX = - (this.currentIndex * (100 / this.numberOfVisibleItems));
+      }
+  }else{
+      if (this.clonedSliderItems.length < this.numberOfVisibleItems * this.numberOfRows) {
+        this.isInfiniteScroll = false;
+        this.sliderItems = [...this.clonedSliderItems];
+        this.handleMoreThanOneRowSliderItems();
+        this.currentIndex = 0;
+        this.translateX = 0;
+        this.calculateIndicators();
+        return;
+      }
+        for(let key in this.clonedCustomSliderItems){
+            if (this.clonedCustomSliderItems[key].length >= this.numberOfVisibleItems) {
+              this.customSliderItems[key] = [...this.clonedCustomSliderItems[key]];
+              const startClone =  this.customSliderItems[key].slice(0,this.numberOfVisibleItems);
+              const endClone =  this.customSliderItems[key].slice(-this.numberOfVisibleItems);
+              this.customSliderItems[key]=[...endClone , ...this.customSliderItems[key],...startClone]
+            }
+        }
+        this.currentIndex = this.numberOfVisibleItems;
+        this.translateX = -(this.currentIndex * (100 / this.numberOfVisibleItems));
+
+      // const itemsPerRow = Math.ceil(this.clonedSliderItems.length / this.numberOfRows);
+      // const totalVisibleItems = this.numberOfVisibleItems * this.numberOfRows;
+      // const startClone = this.clonedSliderItems.slice(0, totalVisibleItems);
+      // const endClone = this.clonedSliderItems.slice(-totalVisibleItems);
+      // this.sliderItems = [...endClone, ...this.clonedSliderItems, ...startClone];
+      // // Step 2: Rebuild customSliderItems based on the new sliderItems
+      // this.customSliderItems = {};
+      // for (let row = 0; row < this.numberOfRows; row++) {
+      //   this.customSliderItems[row] = [];
+      //   for (let i = 0; i < Math.ceil(this.sliderItems.length / this.numberOfRows); i++) {
+      //     const index = i * this.numberOfRows + row;
+      //     if (index < this.sliderItems.length) {
+      //       this.customSliderItems[row].push(this.sliderItems[index]);
+      //     }
+      //   }
+      // }
+      // this.currentIndex = this.numberOfVisibleItems;
+      // this.translateX = -(this.currentIndex * (100 / this.numberOfVisibleItems));
+        console.log(this.customSliderItems ,'custom slider items')
+      }
   }
+
   ngOnInit(): void {
     window.addEventListener('resize', this.onWindowResize.bind(this));
     if (this.responsiveOptions.length) {
@@ -158,7 +206,7 @@ export class SliderComponent implements OnInit {
       this.calculateSliderPosition();
     }
   }
-
+  
   ngAfterViewInit() {
     setTimeout(() => {
       this.initializeHammer();
@@ -180,7 +228,7 @@ export class SliderComponent implements OnInit {
 
   calculateSliderPosition() {
     const itemWidth = 100 / this.sliderOptions.numberOfVisibleItems;
-    this.translateX = this.isRTL ? this.translateX = +(this.currentIndex * itemWidth) : this.translateX = -(this.currentIndex * itemWidth)
+    this.translateX = this.isRTL ? (this.translateX = +(this.currentIndex * itemWidth)) : (this.translateX = -(this.currentIndex * itemWidth));
   }
 
   applyResponsiveOptions(): void {
@@ -199,7 +247,7 @@ export class SliderComponent implements OnInit {
         };
         this.numberOfVisibleItems = config.numVisible;
         this.stepSize = config.numScroll;
-        this.calculateIndicators()
+        this.calculateIndicators();
         configFound = true;
         break;
       }
@@ -212,7 +260,7 @@ export class SliderComponent implements OnInit {
       };
       this.numberOfVisibleItems = this.largestBreakpoint.numVisible;
       this.stepSize = this.largestBreakpoint.numScroll || 1;
-      this.calculateIndicators()
+      this.calculateIndicators();
     }
     // Reset current index if it exceeds the new maximum
     if (this.currentIndex > this.maxCurrentIndex) {
@@ -225,16 +273,16 @@ export class SliderComponent implements OnInit {
 
   slideFinite(direction: 'forward' | 'backward'): void {
     const dir = this.isRTL ? -1 : 1;
-    const movement = direction === 'forward' ? 1 : -1
-    const newIndex = this.currentIndex + (dir * this.stepSize * movement);
+    const movement = direction === 'forward' ? 1 : -1;
+    const newIndex = this.currentIndex + dir * this.stepSize * movement;
     if (newIndex >= 0 && newIndex <= this.maxCurrentIndex) {
       this.currentIndex = newIndex;
       this.calculateSliderPosition();
     }
-
   }
 
   slideInfinite(direction: 'forward' | 'backward'): void {
+    if(this.sliderItems.length >= this.numberOfVisibleItems){
     const dir = direction === 'forward' ? 1 : -1;
     const step = (this.isRTL ? -1 : 1) * dir * this.stepSize;
     this.currentIndex += step;
@@ -243,13 +291,15 @@ export class SliderComponent implements OnInit {
     const timeout = parseFloat(this.animationSpeed) * 1000;
     setTimeout(() => {
       this.isTransitionEnabled = false;
-      if (this.currentIndex >= this.sliderItems.length - this.numberOfVisibleItems) {
+      if ( this.currentIndex >=this.sliderItems.length - this.numberOfVisibleItems) {
         this.currentIndex = this.currentIndex - this.clonedSliderItems.length;
       } else if (this.currentIndex < this.numberOfVisibleItems) {
-        this.currentIndex = this.numberOfVisibleItems + this.clonedSliderItems.length - (this.numberOfVisibleItems - this.currentIndex);
+        this.currentIndex = this.numberOfVisibleItems +  this.clonedSliderItems.length - (this.numberOfVisibleItems - this.currentIndex);
       }
+
       this.calculateSliderPosition();
     }, timeout);
+     }
   }
 
   nextFunc(): void {
@@ -264,13 +314,13 @@ export class SliderComponent implements OnInit {
     if (this.isInfiniteScroll) {
       this.slideInfinite('backward');
     } else {
-      this.slideFinite('backward')
+      this.slideFinite('backward');
     }
   }
 
   // indicators
   goToSlide(index: number): void {
-    this.currentIndex = this.isInfiniteScroll ? this.numberOfVisibleItems + (index * this.stepSize) : Math.min(index * this.stepSize, this.maxCurrentIndex);
+    this.currentIndex = this.isInfiniteScroll ? this.numberOfVisibleItems + index * this.stepSize : Math.min(index * this.stepSize, this.maxCurrentIndex);
     this.isTransitionEnabled = true;
     this.calculateSliderPosition();
   }
@@ -285,44 +335,39 @@ export class SliderComponent implements OnInit {
     } else if (normalizedIndex >= this.clonedSliderItems.length) {
       normalizedIndex = normalizedIndex - this.clonedSliderItems.length;
     }
-    normalizedIndex = Math.max(0, Math.min(normalizedIndex, this.clonedSliderItems.length - 1));
+    normalizedIndex = Math.max(0,Math.min(normalizedIndex, this.clonedSliderItems.length - 1));
     return Math.floor(normalizedIndex / this.stepSize);
   }
 
   // drag
   private initializeHammer() {
     let sliderElement: HTMLElement | null = null;
-    if (this.sliderOptions.rows == 1) {
-      if (this.singleRowSlider && this.singleRowSlider.nativeElement) {
-        sliderElement = this.singleRowSlider.nativeElement;
-      }
-    } else if (this.sliderOptions.rows > 1) {
-      if (this.multiRowSlider && this.multiRowSlider.nativeElement) {
-        sliderElement = this.multiRowSlider.nativeElement;
-      }
+    if (this.rowSlider && this.rowSlider.nativeElement) {
+      sliderElement = this.rowSlider.nativeElement;
     }
     if (!sliderElement) {
       console.warn('Slider element not found');
       return;
     }
+
     this.hammer = new Hammer(sliderElement);
     this.hammer.get('pan').set({
       direction: Hammer.DIRECTION_HORIZONTAL,
       threshold: 10,
     });
-    this.hammer.on('panstart', (ev) => {
+    this.hammer.on('panstart', (ev: any) => {
       this.onDragStart(ev);
     });
-    this.hammer.on('panmove', (ev) => {
+    this.hammer.on('panmove', (ev: any) => {
       this.onDragMove(ev);
     });
-    this.hammer.on('panend', (ev) => {
+    this.hammer.on('panend', (ev: any) => {
       this.onDragEnd(ev);
     });
   }
 
   private onDragStart(event: any): void {
-    if (!this.isDraggable) return;
+    if ( !this.isDraggable || this.sliderItems.length <= this.numberOfVisibleItems ) return;
     this.isDragging = true;
     this.dragStartTranslateX = this.translateX;
     if (this.sliderOptions.autoplay) {
@@ -332,8 +377,8 @@ export class SliderComponent implements OnInit {
   }
 
   private onDragMove(event: any): void {
-    if (!this.isDragging || !this.isDraggable) return;
-    const containerWidth = this.numberOfRows > 1 ? this.multiRowSlider.nativeElement.offsetWidth : this.singleRowSlider.nativeElement.offsetWidth;
+    if (!this.isDragging ||!this.isDraggable || this.sliderItems.length <= this.numberOfVisibleItems) return;
+    const containerWidth = this.rowSlider.nativeElement.offsetWidth;
     const dragPercentage = (event.deltaX / containerWidth) * 100;
     if (this.isRTL) {
       this.translateX = this.dragStartTranslateX - dragPercentage;
@@ -344,29 +389,41 @@ export class SliderComponent implements OnInit {
   }
 
   private onDragEnd(event: any): void {
-    if (!this.isDragging || !this.isDraggable) return;
-
+    if ( !this.isDragging ||!this.isDraggable ||  this.sliderItems.length <= this.numberOfVisibleItems)return;
     this.isDragging = false;
     this.isTransitionEnabled = true;
     const dragDistance = Math.abs(event.deltaX);
+    // Check if drag distance exceeds threshold
+    if (dragDistance < this.dragThreshold) {
+      // Reset to original position if drag was too small
+      this.calculateSliderPosition();
+      if (this.sliderOptions.autoplay) {
+        this.startAutoplay();
+      }
+      return;
+    }
     let shouldMove = false;
     if (this.isInfiniteScroll) {
-      shouldMove = Math.abs(dragDistance) > this.dragThreshold;
+      shouldMove = true;
     } else {
-      shouldMove = this.currentIndex <= this.maxCurrentIndex - this.stepSize;
+      if (event.deltaX < 0) {
+        shouldMove = this.isRTL ? this.currentIndex > 0 : this.currentIndex <= this.maxCurrentIndex - this.stepSize;
+      } else {
+        shouldMove = this.isRTL  ? this.currentIndex <= this.maxCurrentIndex - this.stepSize : this.currentIndex > 0;
+      }
     }
     if (shouldMove) {
       if (this.isRTL) {
-        if (event.deltaX > 0) {
+        if (event.deltaX < 0) {
           this.nextFunc();
         } else {
           this.prevFunc();
         }
       } else {
-        if (event.deltaX > 0) {
-          this.prevFunc();
-        } else {
+        if (event.deltaX < 0) {
           this.nextFunc();
+        } else {
+          this.prevFunc();
         }
       }
     } else {
