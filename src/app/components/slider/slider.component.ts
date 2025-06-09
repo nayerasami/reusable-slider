@@ -26,10 +26,7 @@ import Hammer from 'hammerjs';
   styleUrl: './slider.component.scss',
 })
 export class SliderComponent implements OnInit {
-  constructor(
-    private cdr: ChangeDetectorRef,
-    private sanitizer: DomSanitizer
-  ) {}
+  constructor( private cdr: ChangeDetectorRef, private sanitizer: DomSanitizer) {}
   @ContentChild('itemTemplate') itemTemplate!: TemplateRef<any>;
   @ViewChild('rowSlider', { static: false }) rowSlider!: ElementRef;
   @Input() responsiveOptions: any;
@@ -54,6 +51,7 @@ export class SliderComponent implements OnInit {
   safePrevButton: any;
   safeNextButton: any;
   customSliderItems: any = {};
+  clonedCustomSliderItems:any ={};
   numberOfRows: number = 1;
   rowsArray: any[] = [];
   isTransitionEnabled = true;
@@ -111,9 +109,13 @@ export class SliderComponent implements OnInit {
           }
         }
       }
+   
+    this.clonedCustomSliderItems = {};
+    for (let key in this.customSliderItems) {
+      this.clonedCustomSliderItems[key] = [...this.customSliderItems[key]];
+    } 
     }
   }
-
   setDefaultSliderSettings(): void {
     if (this.sliderOptions) {
       this.numberOfVisibleItems = this.sliderOptions.numberOfVisibleItems || 4;
@@ -136,12 +138,15 @@ export class SliderComponent implements OnInit {
     }
   }
   handleInfiniteScrollSliderItems() {
-    if (!this.isInfiniteScroll) {
+   
+  if(this.numberOfRows == 1 ){
+     if (!this.isInfiniteScroll) {
       this.sliderItems = [...this.clonedSliderItems];
       this.currentIndex = 0;
       this.translateX = 0;
-    } else {
-      if(this.sliderItems.length >= this.numberOfVisibleItems){
+      return
+    } 
+    if(this.sliderItems.length >= this.numberOfVisibleItems){
       this.sliderItems = [...this.clonedSliderItems];
       const startClone = this.sliderItems.slice(0, this.numberOfVisibleItems);
       const endClone = this.sliderItems.slice(-this.numberOfVisibleItems);
@@ -149,9 +154,49 @@ export class SliderComponent implements OnInit {
       this.currentIndex = this.numberOfVisibleItems;
       this.translateX = - (this.currentIndex * (100 / this.numberOfVisibleItems));
       }
-     
-    }
+  }else{
+      if (this.clonedSliderItems.length < this.numberOfVisibleItems * this.numberOfRows) {
+        this.isInfiniteScroll = false;
+        this.sliderItems = [...this.clonedSliderItems];
+        this.handleMoreThanOneRowSliderItems();
+        this.currentIndex = 0;
+        this.translateX = 0;
+        this.calculateIndicators();
+        return;
+      }
+        for(let key in this.clonedCustomSliderItems){
+            if (this.clonedCustomSliderItems[key].length >= this.numberOfVisibleItems) {
+              this.customSliderItems[key] = [...this.clonedCustomSliderItems[key]];
+              const startClone =  this.customSliderItems[key].slice(0,this.numberOfVisibleItems);
+              const endClone =  this.customSliderItems[key].slice(-this.numberOfVisibleItems);
+              this.customSliderItems[key]=[...endClone , ...this.customSliderItems[key],...startClone]
+            }
+        }
+        this.currentIndex = this.numberOfVisibleItems;
+        this.translateX = -(this.currentIndex * (100 / this.numberOfVisibleItems));
+
+      // const itemsPerRow = Math.ceil(this.clonedSliderItems.length / this.numberOfRows);
+      // const totalVisibleItems = this.numberOfVisibleItems * this.numberOfRows;
+      // const startClone = this.clonedSliderItems.slice(0, totalVisibleItems);
+      // const endClone = this.clonedSliderItems.slice(-totalVisibleItems);
+      // this.sliderItems = [...endClone, ...this.clonedSliderItems, ...startClone];
+      // // Step 2: Rebuild customSliderItems based on the new sliderItems
+      // this.customSliderItems = {};
+      // for (let row = 0; row < this.numberOfRows; row++) {
+      //   this.customSliderItems[row] = [];
+      //   for (let i = 0; i < Math.ceil(this.sliderItems.length / this.numberOfRows); i++) {
+      //     const index = i * this.numberOfRows + row;
+      //     if (index < this.sliderItems.length) {
+      //       this.customSliderItems[row].push(this.sliderItems[index]);
+      //     }
+      //   }
+      // }
+      // this.currentIndex = this.numberOfVisibleItems;
+      // this.translateX = -(this.currentIndex * (100 / this.numberOfVisibleItems));
+        console.log(this.customSliderItems ,'custom slider items')
+      }
   }
+
   ngOnInit(): void {
     window.addEventListener('resize', this.onWindowResize.bind(this));
     if (this.responsiveOptions.length) {
@@ -161,7 +206,7 @@ export class SliderComponent implements OnInit {
       this.calculateSliderPosition();
     }
   }
-
+  
   ngAfterViewInit() {
     setTimeout(() => {
       this.initializeHammer();
@@ -251,10 +296,10 @@ export class SliderComponent implements OnInit {
       } else if (this.currentIndex < this.numberOfVisibleItems) {
         this.currentIndex = this.numberOfVisibleItems +  this.clonedSliderItems.length - (this.numberOfVisibleItems - this.currentIndex);
       }
+
       this.calculateSliderPosition();
     }, timeout);
      }
-
   }
 
   nextFunc(): void {
@@ -370,9 +415,9 @@ export class SliderComponent implements OnInit {
     if (shouldMove) {
       if (this.isRTL) {
         if (event.deltaX < 0) {
-          this.prevFunc();
-        } else {
           this.nextFunc();
+        } else {
+          this.prevFunc();
         }
       } else {
         if (event.deltaX < 0) {
