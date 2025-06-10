@@ -85,7 +85,7 @@ export class SliderComponent implements OnInit {
         this.startAutoplay();
       }
     }
-   if (changes['responsiveOptions']) {
+    if (changes['responsiveOptions']) {
       if (this.responsiveOptions && this.responsiveOptions.length > 0) {
         this.sortedResponsiveOptons = [...this.responsiveOptions].sort((a, b) =>
           parseInt(a.breakpoint.replace('px', ''), 10) - parseInt(b.breakpoint.replace('px', ''), 10)
@@ -280,7 +280,6 @@ export class SliderComponent implements OnInit {
     this.currentIndex = 0;
     this.calculateSliderPosition();
   }
-
   this.cdr.detectChanges();
   }
 
