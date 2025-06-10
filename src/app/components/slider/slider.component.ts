@@ -85,15 +85,17 @@ export class SliderComponent implements OnInit {
         this.startAutoplay();
       }
     }
-    if (changes['responsiveOptions']) {
-      if (this.responsiveOptions && this.responsiveOptions.length === 0) {
-        this.sortedResponsiveOptons = this.responsiveOptions.sort((a: any, b: any) => parseInt(a.breakpoint.replace('px', ''), 10) - parseInt(b.breakpoint.replace('px', ''), 10) );
-        this.largestBreakpoint = this.sortedResponsiveOptons[this.sortedResponsiveOptons.length - 1];
+   if (changes['responsiveOptions']) {
+      if (this.responsiveOptions && this.responsiveOptions.length > 0) {
+        this.sortedResponsiveOptons = [...this.responsiveOptions].sort((a, b) =>
+          parseInt(a.breakpoint.replace('px', ''), 10) - parseInt(b.breakpoint.replace('px', ''), 10)
+        );
         this.applyResponsiveOptions();
       } else {
         this.setDefaultSliderSettings();
       }
       this.calculateSliderPosition();
+
     }
   }
   handleMoreThanOneRowSliderItems() {
@@ -232,43 +234,54 @@ export class SliderComponent implements OnInit {
   }
 
   applyResponsiveOptions(): void {
-    if (!this.sortedResponsiveOptons || this.sortedResponsiveOptons.length === 0) {
-      return;
+    if (!this.responsiveOptions || !Array.isArray(this.responsiveOptions) || this.responsiveOptions.length === 0) {
+    this.setDefaultSliderSettings();
+    return;
     }
-    const width = window.innerWidth;
-    let configFound = false;
+   this.sortedResponsiveOptons = this.responsiveOptions.sort((a: any, b: any) =>
+    parseInt(a.breakpoint.replace('px', ''), 10) - parseInt(b.breakpoint.replace('px', ''), 10)
+    );
+
+  const width = window.innerWidth;
+
+  if (width > 1400) {
+    this.numberOfVisibleItems = this.sliderOptions.numberOfVisibleItems || 4;
+    this.stepSize = this.sliderOptions.stepSize || 1;
+  } else {
+    let selectedConfig = null;
     for (let config of this.sortedResponsiveOptons) {
       const breakpoint = parseInt(config.breakpoint.replace('px', ''), 10);
-      if (width <= breakpoint) {
-        this.sliderOptions = {
-          ...this.sliderOptions,
-          numberOfVisibleItems: config.numVisible,
-          stepSize: config.numScroll,
-        };
-        this.numberOfVisibleItems = config.numVisible;
-        this.stepSize = config.numScroll;
-        this.calculateIndicators();
-        configFound = true;
+      if (width > breakpoint) {
+        selectedConfig = config;
+      } else if (width <= breakpoint) {
+        selectedConfig = config;
         break;
       }
     }
-    if (!configFound && this.largestBreakpoint) {
-      this.sliderOptions = {
-        ...this.sliderOptions,
-        numberOfVisibleItems: this.largestBreakpoint.numVisible,
-        stepSize: this.largestBreakpoint.numScroll,
-      };
-      this.numberOfVisibleItems = this.largestBreakpoint.numVisible;
-      this.stepSize = this.largestBreakpoint.numScroll || 1;
-      this.calculateIndicators();
+    if (selectedConfig) {
+      this.numberOfVisibleItems = selectedConfig.numVisible;
+      this.stepSize = selectedConfig.numScroll;
+    } else {
+      this.numberOfVisibleItems = this.sliderOptions.numberOfVisibleItems || 4;
+      this.stepSize = this.sliderOptions.stepSize || 1;
     }
-    // Reset current index if it exceeds the new maximum
-    if (this.currentIndex > this.maxCurrentIndex) {
-      this.currentIndex = 0;
-    }
-    this.handleInfiniteScrollSliderItems();
+  }
 
-    this.cdr.detectChanges();
+  this.sliderOptions = {
+    ...this.sliderOptions,
+    numberOfVisibleItems: this.numberOfVisibleItems,
+    stepSize: this.stepSize,
+  };
+
+  this.calculateIndicators();
+  this.handleInfiniteScrollSliderItems();
+
+  if (this.currentIndex > this.maxCurrentIndex) {
+    this.currentIndex = 0;
+    this.calculateSliderPosition();
+  }
+
+  this.cdr.detectChanges();
   }
 
   slideFinite(direction: 'forward' | 'backward'): void {

@@ -14,7 +14,7 @@ export class HomeComponent {
   responsiveOptions: ResponsiveConfig[] = [
     {
       breakpoint: '1400px',
-      numVisible:3,
+      numVisible:4,
       numScroll:1
     },
     {
@@ -39,7 +39,7 @@ export class HomeComponent {
     autoplay: false,
     autoplaySpeed: 3000,
     indicators: true,
-    infiniteScroll: true,
+    infiniteScroll: false,
    // isDraggable: false,
    // numberOfVisibleItems: 4,
    // stepSize:3,
@@ -47,7 +47,7 @@ export class HomeComponent {
    // rtl: true,
     animation: 'ease-in-out',
     animationSpeed: '0.8s',
-    rows:2
+    rows:1
     // nextButton:'<div class="next">next</div>',
     // prevButton:'<div class="next">pre</div>'
   }
@@ -56,11 +56,11 @@ export class HomeComponent {
     { id: 1, name: 'slide 1' },
     { id: 2, name: 'slide 2' },
     { id: 3, name: 'slide 3' },
-    { id: 4, name: 'slide 4' },
-   { id: 5, name: 'slide 5' },
-    { id: 6, name: 'slide 6' },
-    { id: 7, name: 'slide 7' },
-    { id: 8, name: 'slide 8' },
+    //{ id: 4, name: 'slide 4' },
+   //{ id: 5, name: 'slide 5' },
+    //{ id: 6, name: 'slide 6' },
+    //{ id: 7, name: 'slide 7' },
+    //{ id: 8, name: 'slide 8' },
   //  { id: 9, name: 'slide 9' },
    //{ id: 10, name: 'slide 10' },
   //   { id: 11, name: 'slide 11' },
