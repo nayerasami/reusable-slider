@@ -227,7 +227,7 @@ export class SliderComponent implements OnInit {
   }
 
   calculateSliderPosition() {
-    const itemWidth = 100 / this.sliderOptions.numberOfVisibleItems;
+    const itemWidth = 100 / this.numberOfVisibleItems;
     this.translateX = this.isRTL ? (this.translateX = +(this.currentIndex * itemWidth)) : (this.translateX = -(this.currentIndex * itemWidth));
   }
 
@@ -246,7 +246,6 @@ export class SliderComponent implements OnInit {
       this.stepSize = this.sliderOptions.stepSize;
     } else {
       let selectedConfig = null;
-      console.log(this.sortedResponsiveOptons, ' sorted responsive config')
       for (let config of this.sortedResponsiveOptons) {
         const breakpoint = parseInt(config.breakpoint.replace('px', ''), 10);
         if (width > breakpoint) {
@@ -260,21 +259,27 @@ export class SliderComponent implements OnInit {
         this.numberOfVisibleItems = selectedConfig.numVisible;
         this.stepSize = selectedConfig.numScroll;
       }
+      console.log('selectedConfig', selectedConfig);
+      console.log('width', width);
+
     }
     this.calculateIndicators();
     this.handleInfiniteScrollSliderItems();
 
-    // if (!this.isInfiniteScroll && this.currentIndex > this.maxCurrentIndex) {
-    //   this.currentIndex = 0;
-    //   this.calculateSliderPosition();
-    // }
+    if (!this.isInfiniteScroll && this.currentIndex > this.maxCurrentIndex) {
+      this.currentIndex = 0;
+      this.calculateSliderPosition();
+    }
     this.cdr.detectChanges();
   }
 
   slideFinite(direction: 'forward' | 'backward'): void {
     const dir = this.isRTL ? -1 : 1;
     const movement = direction === 'forward' ? 1 : -1;
+    console.log('number of visible itemss' , this.numberOfVisibleItems);
+    console.log('step sizee',this.stepSize);
     const newIndex = this.currentIndex + dir * this.stepSize * movement;
+
     if (newIndex >= 0 && newIndex <= this.maxCurrentIndex) {
       this.currentIndex = newIndex;
       this.calculateSliderPosition();
@@ -284,9 +289,9 @@ export class SliderComponent implements OnInit {
   handleSingleRowInfiniteLoop() {
     if (this.sliderItems.length < this.numberOfVisibleItems) return;
     if (this.currentIndex >= this.sliderItems.length - this.numberOfVisibleItems) {
-      this.currentIndex = this.numberOfVisibleItems;
+        this.currentIndex = this.currentIndex - this.clonedSliderItems.length;
     } else if (this.currentIndex < this.numberOfVisibleItems) {
-      this.currentIndex = this.sliderItems.length - 2 * this.numberOfVisibleItems;
+        this.currentIndex = this.numberOfVisibleItems + this.clonedSliderItems.length - (this.numberOfVisibleItems - this.currentIndex);
     }
   }
 

@@ -33,8 +33,8 @@
         inset-inline-end: 20px;
       }
     }
-    
-    .slider-indicators {
+  }
+     .slider-indicators {
       display: flex;
       justify-content: center;
       margin-top: 15px;
@@ -48,10 +48,9 @@
         transition: background-color 0.3s ease;
         &.active {
           background-color: #333;
-        }    
+        }
       }
     }
-  }
 }
 
 
