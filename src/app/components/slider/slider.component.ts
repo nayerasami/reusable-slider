@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, ContentChild, ElementRef, Input, OnInit, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { ResponsiveConfig, SliderOptions, CustomSliderItems, } from './interfaces/sliderTypes';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser';
 import Hammer from 'hammerjs';
 @Component({
   selector: 'app-slider',
@@ -240,7 +240,8 @@ export class SliderComponent implements OnInit {
       parseInt(a.breakpoint.replace('px', ''), 10) - parseInt(b.breakpoint.replace('px', ''), 10)
     );
     const width = window.innerWidth;
-    if (width > 1400) {
+    const largestBreakpoint = this.sortedResponsiveOptons[this.sortedResponsiveOptons.length - 1].breakpoint.replace('px', '');
+    if (width > largestBreakpoint) {
       this.numberOfVisibleItems = this.sliderOptions.numberOfVisibleItems;
       this.stepSize = this.sliderOptions.stepSize;
     } else {
