@@ -15,11 +15,11 @@ export class HomeComponent {
     {
       breakpoint: '1400px',
       numVisible:4,
-      numScroll:2
+      numScroll: 1
     },
     {
       breakpoint: '1199px',
-      numVisible: 4,
+      numVisible: 2,
       numScroll: 1
     },
     {
@@ -39,15 +39,15 @@ export class HomeComponent {
     autoplay: false,
     autoplaySpeed: 3000,
     indicators: true,
-    infiniteScroll: true,
-   // isDraggable: false,
-    numberOfVisibleItems: 4,
-    stepSize:3,
-    spaceBetween:20,
-  //  rtl: true,
+    infiniteScroll: false,
+    // isDraggable: false,
+   // numberOfVisibleItems: 4,
+    //stepSize: 2,
+    spaceBetween: 20,
+    //  rtl: true,
     animation: 'ease-in-out',
     animationSpeed: '0.8s',
-    rows:2
+    rows: 2
     // nextButton:'<div class="next">next</div>',
     // prevButton:'<div class="next">pre</div>'
   }
@@ -61,14 +61,14 @@ export class HomeComponent {
     { id: 6, name: 'slide 6' },
     { id: 7, name: 'slide 7' },
     { id: 8, name: 'slide 8' },
-   { id: 9, name: 'slide 9' },
-  //  { id: 10, name: 'slide 10' },
-  //    { id: 11, name: 'slide 11' },
-  //  { id: 12, name: 'slide 12' },
-  //   { id: 13, name: 'slide 13' },
-  //   { id: 14, name: 'slide 14' },
-  //   { id: 15, name: 'slide 15' },
-  //   { id: 16, name: 'slide 16' },
+     { id: 9, name: 'slide 9' },
+    // { id: 10, name: 'slide 10' },
+    // { id: 11, name: 'slide 11' },
+    // { id: 12, name: 'slide 12' },
+    // { id: 13, name: 'slide 13' },
+    // { id: 14, name: 'slide 14' },
+    // { id: 15, name: 'slide 15' },
+    // { id: 16, name: 'slide 16' },
   ]
 
 

@@ -1,9 +1,9 @@
 <section class="slider" [style.direction]="isRTL ? 'rtl' : 'ltr'">
   <div class="slider-wrap" (mouseenter)="stopAutoplay()" (mouseleave)="startAutoplay()">
-    
+
+    <!-- gap: spaceBetween + 'px', -->
     <div class="slider-main d-flex" [ngClass]="sliderOptions.rows > 1 ? 'flex-column' : ''" #rowSlider
           [ngStyle]="{
-            gap: spaceBetween + 'px',
             transform: 'translateX(' + translateX + '%)',
             transition: isTransitionEnabled ? ('transform ' + animationSpeed + ' ' + animation) : 'none',
             cursor: isDraggable ? (isDragging ? 'grabbing' : 'grab') : 'default'
@@ -14,8 +14,8 @@
         @for (item of sliderItems; track trackItemFun(item, $index);) {
         <div class="slider-item"
             [ngStyle]="{
-              width: 'calc(' + (100 / numberOfVisibleItems) + '% - ' + (numberOfVisibleItems > 1 ? spaceBetween : 0) + 'px)',
-              marginInline: numberOfVisibleItems > 1 ? spaceBetween / 2 + 'px' : '0',
+              width: 'calc(' + (100 / numberOfVisibleItems) + '% - ' + spaceBetween + 'px)',
+              marginInline: spaceBetween / 2 + 'px',
               'user-select': isDragging ? 'none' : 'auto',
               'pointer-events': isDragging ? 'none' : 'auto'
             }">
@@ -27,9 +27,8 @@
         @for(row of rowsArray; track trackItemFun(row, $index);) {
           <div class="slider-row">
             @for (item of customSliderItems[row]; track trackItemFun(item, $index);) {
-            <div class="slider-item"
-                  [ngStyle]="{   width: 'calc(' + (100 / numberOfVisibleItems) + '% - ' + (numberOfVisibleItems > 1 ? spaceBetween : 0) + 'px)',
-                    marginInline: numberOfVisibleItems > 1 ? spaceBetween / 2 + 'px' : '0' }">
+            <div class="slider-item" [ngStyle]="{   width: 'calc(' + (100 / numberOfVisibleItems) + '% - ' + spaceBetween + 'px)',  marginInline: spaceBetween / 2 + 'px'}"
+                  [style.visibility]= "item.type == 'virtual' ? 'hidden' : 'visible'">
               <ng-container *ngTemplateOutlet="itemTemplate; context: {$implicit: item}"></ng-container>
             </div>
             }
@@ -38,25 +37,26 @@
       }
     </div>
 
-    <!-- Navigation Buttons -->
-    <ng-container *ngIf="sliderOptions.navButtons">
-      <div class="slider-nav">
-        <div class="prev" (click)="prevFunc()" *ngIf="!sliderOptions.prevButton; else customPrev">
-          <i class="bi bi-arrow-left-circle"></i>
-        </div>
-        <div class="next" (click)="nextFunc()" *ngIf="!sliderOptions.nextButton; else customNext">
-          <i class="bi bi-arrow-right-circle"></i>
-        </div>
-
-        <ng-template #customPrev>
-          <div class="prev" [innerHtml]="safePrevButton" (click)="prevFunc()"></div>
-        </ng-template>
-        <ng-template #customNext>
-          <div class="next" [innerHtml]="safeNextButton" (click)="nextFunc()"></div>
-        </ng-template>
-      </div>
-    </ng-container>
   </div>
+
+  <!-- Navigation Buttons -->
+  <ng-container *ngIf="sliderOptions.navButtons">
+    <div class="slider-nav">
+      <div class="prev" (click)="prevFunc()" *ngIf="!sliderOptions.prevButton; else customPrev">
+       prev
+      </div>
+      <div class="next" (click)="nextFunc()" *ngIf="!sliderOptions.nextButton; else customNext">
+        next
+      </div>
+
+      <ng-template #customPrev>
+        <div class="prev" [innerHtml]="safePrevButton" (click)="prevFunc()"></div>
+      </ng-template>
+      <ng-template #customNext>
+        <div class="next" [innerHtml]="safeNextButton" (click)="nextFunc()"></div>
+      </ng-template>
+    </div>
+  </ng-container>
 
   <!-- Indicators -->
   <div class="slider-indicators" *ngIf="sliderOptions.indicators && indicatorsArray.length > 1">
