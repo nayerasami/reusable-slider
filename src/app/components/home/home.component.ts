@@ -12,37 +12,42 @@ import { CommonModule } from '@angular/common';
 export class HomeComponent {
 
   responsiveOptions: ResponsiveConfig[] = [
-      {
-        breakpoint: '1400px',
-        numVisible: 3,
-        numScroll: 3
-      },
-      {
-        breakpoint: '992px',
-        numVisible: 2.2,
-        numScroll: 2
-      },
-      {
-        breakpoint: '768',
-        numVisible: 1,
-        numScroll: 1
-      }
-    ];
-    
+    {
+      breakpoint: '1400px',
+      numVisible: 3,
+      numScroll: 2
+    },
+    {
+      breakpoint: '1199px',
+      numVisible: 3,
+      numScroll: 1
+    },
+    {
+      breakpoint: '767px',
+      numVisible: 2,
+      numScroll: 1
+    },
+    {
+      breakpoint: '575px',
+      numVisible: 1,
+      numScroll: 1
+    }
+  ];
+
   sliderOptions: SliderOptions = {
     navButtons: true,
     autoplay: false,
     autoplaySpeed: 3000,
     indicators: true,
-    infiniteScroll: true,
+    //infiniteScroll: true,
     // isDraggable: false,
-    numberOfVisibleItems: 4,
-    stepSize: 3,
+    numberOfVisibleItems: 3,
+    stepSize:4,
     //spaceBetween:50,
     // rtl: true,
     animation: 'ease-in-out',
     animationSpeed: '0.8s',
-    rows: 1
+    rows: 2
     // nextButton:'<div class="next">next</div>',
     // prevButton:'<div class="next">pre</div>'
   }
@@ -55,7 +60,7 @@ export class HomeComponent {
     { id: 5, name: 'slide 5' },
     { id: 6, name: 'slide 6' },
     { id: 7, name: 'slide 7' },
-   // { id: 8, name: 'slide 8' },
+    // { id: 8, name: 'slide 8' },
     // { id: 9, name: 'slide 9' },
     // { id: 10, name: 'slide 10' },
     // { id: 11, name: 'slide 11' },

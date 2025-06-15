@@ -132,6 +132,9 @@ export class SliderComponent implements OnInit {
 
     }
   }
+
+
+
   setDefaultSliderSettings(): void {
     if (this.sliderOptions) {
       this.numberOfVisibleItems = this.sliderOptions.numberOfVisibleItems || 4;
@@ -234,6 +237,10 @@ export class SliderComponent implements OnInit {
   applyResponsiveOptions(): void {
     if (!this.responsiveOptions || !Array.isArray(this.responsiveOptions) || this.responsiveOptions.length === 0) {
       this.setDefaultSliderSettings();
+      if (this.stepSize > this.numberOfVisibleItems) {
+        this.stepSize = this.numberOfVisibleItems;
+      }
+      this.calculateIndicators();
       return;
     }
     this.sortedResponsiveOptons = this.responsiveOptions.sort((a: any, b: any) =>
@@ -259,25 +266,20 @@ export class SliderComponent implements OnInit {
         this.numberOfVisibleItems = selectedConfig.numVisible;
         this.stepSize = selectedConfig.numScroll;
       }
-      console.log('selectedConfig', selectedConfig);
-      console.log('width', width);
 
+    }
+    if (this.stepSize > this.numberOfVisibleItems) {
+      this.stepSize = this.numberOfVisibleItems;
     }
     this.calculateIndicators();
     this.handleInfiniteScrollSliderItems();
-
-    if (!this.isInfiniteScroll && this.currentIndex > this.maxCurrentIndex) {
-      this.currentIndex = 0;
-      this.calculateSliderPosition();
-    }
     this.cdr.detectChanges();
   }
+
 
   slideFinite(direction: 'forward' | 'backward'): void {
     const dir = this.isRTL ? -1 : 1;
     const movement = direction === 'forward' ? 1 : -1;
-    console.log('number of visible itemss' , this.numberOfVisibleItems);
-    console.log('step sizee',this.stepSize);
     const newIndex = this.currentIndex + dir * this.stepSize * movement;
 
     if (newIndex >= 0 && newIndex <= this.maxCurrentIndex) {
@@ -289,9 +291,9 @@ export class SliderComponent implements OnInit {
   handleSingleRowInfiniteLoop() {
     if (this.sliderItems.length < this.numberOfVisibleItems) return;
     if (this.currentIndex >= this.sliderItems.length - this.numberOfVisibleItems) {
-        this.currentIndex = this.currentIndex - this.clonedSliderItems.length;
+      this.currentIndex = this.currentIndex - this.clonedSliderItems.length;
     } else if (this.currentIndex < this.numberOfVisibleItems) {
-        this.currentIndex = this.numberOfVisibleItems + this.clonedSliderItems.length - (this.numberOfVisibleItems - this.currentIndex);
+      this.currentIndex = this.numberOfVisibleItems + this.clonedSliderItems.length - (this.numberOfVisibleItems - this.currentIndex);
     }
   }
 
@@ -306,6 +308,7 @@ export class SliderComponent implements OnInit {
       this.currentIndex = itemsPerRow + cloneCount - (cloneCount - this.currentIndex);
     }
   }
+
   slideInfinite(direction: 'forward' | 'backward'): void {
     const dir = this.isRTL ? -1 : 1;
     const movement = direction === 'forward' ? 1 : -1;
@@ -389,7 +392,10 @@ export class SliderComponent implements OnInit {
   }
 
   private onDragStart(event: any): void {
-    if (!this.isDraggable || this.sliderItems.length <= this.numberOfVisibleItems) return;
+    if (!this.isDraggable || this.sliderItems.length / this.numberOfRows <= this.numberOfVisibleItems) {
+      this.isDragging = false;
+      return;
+    }
     this.isDragging = true;
     this.dragStartTranslateX = this.translateX;
     if (this.sliderOptions.autoplay) {
@@ -399,7 +405,7 @@ export class SliderComponent implements OnInit {
   }
 
   private onDragMove(event: any): void {
-    if (!this.isDragging || !this.isDraggable || this.sliderItems.length <= this.numberOfVisibleItems) return;
+    if (!this.isDragging || !this.isDraggable || this.sliderItems.length / this.numberOfRows <= this.numberOfVisibleItems) return;
     const containerWidth = this.rowSlider.nativeElement.offsetWidth;
     const dragPercentage = (event.deltaX / containerWidth) * 100;
     this.translateX = this.dragStartTranslateX + dragPercentage;
@@ -407,8 +413,7 @@ export class SliderComponent implements OnInit {
   }
 
   private onDragEnd(event: any): void {
-    if (!this.isDragging || !this.isDraggable || this.sliderItems.length <= this.numberOfVisibleItems) return;
-    this.isDragging = false;
+    if (!this.isDragging || !this.isDraggable || this.sliderItems.length / this.numberOfRows <= this.numberOfVisibleItems) return;
     this.isTransitionEnabled = true;
     const dragDistance = Math.abs(event.deltaX);
     // Check if drag distance exceeds threshold

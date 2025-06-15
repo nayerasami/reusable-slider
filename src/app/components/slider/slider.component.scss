@@ -17,22 +17,31 @@
       width: 100%;
     }
 
-    .slider-nav {
-      .prev,
-      .next {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 30px;
-        cursor: pointer;
-      }
-      .prev {
-        inset-inline-start: 20px;
-      }
-      .next {
-        inset-inline-end: 20px;
+  .slider-nav {
+    .prev,
+    .next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      background: #ffffff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      svg {
+        fill: #333;
       }
     }
+    .prev {
+      inset-inline-start: 20px;
+    }
+    .next {
+      inset-inline-end: 20px;
+    }
+  }
   }
      .slider-indicators {
       display: flex;
