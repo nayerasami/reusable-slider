@@ -1,61 +1,68 @@
 <section class="slider" [dir]="isRTL ? 'rtl' : 'ltr'" (select)="$event.preventDefault()">
-  <div class="slider-wrap" (mouseenter)="stopAutoplay()" (mouseleave)="startAutoplay()" >
+  <div class="slider-wrap" (mouseenter)="stopAutoplay()" (mouseleave)="startAutoplay()">
 
     <!-- gap: spaceBetween + 'px', -->
-    <div class="slider-main d-flex" [ngClass]="numberOfRows > 1 ? 'flex-column' : ''" #rowSlider
-          [ngStyle]="{
+    <div class="slider-main d-flex" [ngClass]="numberOfRows > 1 ? 'flex-column' : ''" #rowSlider [ngStyle]="{
             transform: 'translateX(' + translateX + '%)',
             transition: isTransitionEnabled ? ('transform ' + animationSpeed + ' ' + animation) : 'none',
             cursor: isDraggable ? (isDragging ? 'grabbing' : 'grab') : 'default',
             gap: numberOfRows > 1 ? spaceBetween + 'px' : null
-          }"
-          [attr.data-draggable]="isDraggable">
+          }" [attr.data-draggable]="isDraggable">
       @if(numberOfRows == 1) {
-        @for (item of sliderItems; track trackItemFun(item, $index);) {
-        <div class="slider-item"
-            [ngStyle]="{
+      @for (item of sliderItems; track trackItemFun(item, $index);) {
+      <div class="slider-item" [ngStyle]="{
               width: 'calc(' + (100 / numberOfVisibleItems) + '% - ' + spaceBetween + 'px)',
               marginInline: spaceBetween / 2 + 'px',
               'pointer-events': isDragging ? 'none' : 'auto'
             }">
+        <ng-container *ngTemplateOutlet="itemTemplate; context: {$implicit: item}"></ng-container>
+      </div>
+      }
+      }
+      @else if(numberOfRows > 1) {
+      @for(row of rowsArray; track trackItemFun(row, $index);) {
+      <div class="slider-row">
+        @for (item of customSliderItems[row]; track trackItemFun(item, $index);) {
+        <div class="slider-item"
+          [ngStyle]="{ width: 'calc(' + (100 / numberOfVisibleItems) + '% - ' + spaceBetween + 'px)', marginInline: spaceBetween / 2 + 'px'}"
+          [style.visibility]="item.type === 'virtual' ? 'hidden' : 'visible'">
           <ng-container *ngTemplateOutlet="itemTemplate; context: {$implicit: item}"></ng-container>
         </div>
         }
+      </div>
       }
-      @else if(numberOfRows > 1) {
-        @for(row of rowsArray; track trackItemFun(row, $index);) {
-          <div class="slider-row">
-            @for (item of customSliderItems[row]; track trackItemFun(item, $index);) {
-            <div class="slider-item" [ngStyle]="{ width: 'calc(' + (100 / numberOfVisibleItems) + '% - ' + spaceBetween + 'px)', marginInline: spaceBetween / 2 + 'px'}"
-                    [style.visibilty]="item.type == 'virtual' ? 'hidden':'visible'">
-              <ng-container *ngTemplateOutlet="itemTemplate; context: {$implicit: item}"></ng-container>
-            </div>
-            }
-          </div>
-        }
       }
     </div>
   </div>
 
   <!-- Navigation Buttons -->
-  <ng-container *ngIf="sliderOptions.navButtons && ( !isInfiniteScroll && this.clonedSliderItems.length /  this.numberOfRows > this.numberOfVisibleItems ) ">
+  <ng-container
+    *ngIf="sliderOptions.navButtons && (isInfiniteScroll || (!isInfiniteScroll && (clonedSliderItems.length / numberOfRows > numberOfVisibleItems)))">
     <div class="slider-nav">
-      <button role="button" [ngClass]="[isRTL ? 'next' : 'prev' , isPrevDisabled() ? 'disabled' : '']" (click)="prevFunc()" *ngIf="!sliderOptions.prevButton; else customPrev">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+      <button role="button" [ngClass]="[isRTL ? 'next' : 'prev' , isPrevDisabled() ? 'disabled' : '']"
+        (click)="prevFunc()" *ngIf="!sliderOptions.prevButton; else customPrev">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left"
+          viewBox="0 0 16 16">
+          <path fill-rule="evenodd"
+            d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
         </svg>
       </button>
-      <button role="button" [ngClass]="[isRTL ? 'prev' : 'next' , isNextDisabled() ? 'disabled' : '']"  (click)="nextFunc()" *ngIf="!sliderOptions.nextButton; else customNext">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
+      <button role="button" [ngClass]="[isRTL ? 'prev' : 'next' , isNextDisabled() ? 'disabled' : '']"
+        (click)="nextFunc()" *ngIf="!sliderOptions.nextButton; else customNext">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right"
+          viewBox="0 0 16 16">
+          <path fill-rule="evenodd"
+            d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708" />
         </svg>
       </button>
 
       <ng-template #customPrev>
-        <button role="button" [ngClass]="[isRTL ? 'next' : 'prev' , isPrevDisabled() ? 'disabled' : '']" [innerHtml]="isRTL ? safeNextButton : safePrevButton" (click)="prevFunc()"></button>
+        <button role="button" [ngClass]="[isRTL ? 'next' : 'prev' , isPrevDisabled() ? 'disabled' : '']"
+          [innerHtml]="isRTL ? safeNextButton : safePrevButton" (click)="prevFunc()"></button>
       </ng-template>
       <ng-template #customNext>
-        <button role="button" [ngClass]="[isRTL ? 'prev' : 'next' ,isNextDisabled() ? 'disabled' : '']" [innerHtml]="isRTL ? safePrevButton : safeNextButton" (click)="nextFunc()"></button>
+        <button role="button" [ngClass]="[isRTL ? 'prev' : 'next' ,isNextDisabled() ? 'disabled' : '']"
+          [innerHtml]="isRTL ? safePrevButton : safeNextButton" (click)="nextFunc()"></button>
       </ng-template>
     </div>
   </ng-container>
