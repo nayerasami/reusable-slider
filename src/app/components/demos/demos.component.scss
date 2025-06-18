@@ -15,6 +15,14 @@
 
 }
 
+@mixin rtl($property, $ltr-value, $rtl-value) {
+  #{$property}: $ltr-value;
+
+  [dir="rtl"] & {
+    #{$property}: $rtl-value;
+  }
+}
+
 .text {
   position: absolute;
   top: 50%;
@@ -45,12 +53,15 @@
     .section-title {
       font-family: 'IBMPlexSansArabic-SemiBold';
       text-align: center;
+
       @media (min-width: 1200px) {
         font-size: 2.5rem;
       }
+
       @media (min-width: 992px) and (max-width: 1199.98px) {
         font-size: 2rem;
       }
+
       @media (max-width: 991.98px) {
         font-size: 1.75rem;
       }
@@ -58,6 +69,7 @@
 
     .section-desc {
       line-height: 1.6;
+
       @media (max-width: 767.98px) {
         font-size: 0.875rem;
       }
@@ -70,4 +82,8 @@
     padding: 16px;
     margin: 16px;
   }
+}
+
+.img-flip {
+  @include rtl(transform, scaleX(-1), scaleX(1));
 }

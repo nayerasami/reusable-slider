@@ -7,7 +7,7 @@ import { HearderComponent } from "../hearder/hearder.component";
   selector: 'app-demos',
   imports: [SliderComponent],
   templateUrl: './demos.component.html',
-  styleUrl: './demos.component.css'
+  styleUrl: './demos.component.scss'
 })
 export class DemosComponent {
   responsiveOptions: ResponsiveConfig[] = [
@@ -158,7 +158,6 @@ export class DemosComponent {
     autoplaySpeed: 3000,
     indicators: true,
     infiniteScroll: true,
-    // isDraggable: false,
     numberOfVisibleItems: 4,
     stepSize: 3,
     //spaceBetween:50,
@@ -233,5 +232,28 @@ export class DemosComponent {
     //rows: 1
     // nextButton:'<div class="next">next</div>',
     // prevButton:'<div class="next">pre</div>'
+  };
+
+  customNavButtonsSliderItems = [
+    { id: 1, name: 'slide 1' },
+    { id: 2, name: 'slide 2' },
+    { id: 3, name: 'slide 3' },
+    { id: 4, name: 'slide 4' },
+    { id: 5, name: 'slide 5' },
+    { id: 6, name: 'slide 6' },
+    { id: 7, name: 'slide 7' },
+    { id: 8, name: 'slide 8' },
+    { id: 9, name: 'slide 9' },
+  ];
+
+  customNavButtonsSliderOptions = {
+    navButtons: true,
+    autoplay: false,
+    autoplaySpeed: 3000,
+    indicators: true,
+    numberOfVisibleItems: 3,
+    stepSize: 1,
+    nextButton: '<img src="/assets/images/icons/arrow-left.svg" width="25" height="24" alt="Icon" class="filter-white img-flip" />',
+    prevButton: '<img src="/assets/images/icons/arrow-right.svg" width="25" height="24"  alt="Icon" class="filter-white img-flip" />'
   };
 }
