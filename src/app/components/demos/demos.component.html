@@ -1,0 +1,92 @@
+<div class="demos-section">
+  <!-- SINGLE ITEM -->
+  <div class="main-section single-item">
+    <h2 class="section-title">Single Item </h2>
+    <div class="slider-element">
+      <app-slider [sliderOptions]="singleItemSliderOptions" [sliderItems]="singleItemSliderItems">
+        <ng-template #itemTemplate let-item>
+          <div class="text">{{ item.name }}</div>
+        </ng-template>
+      </app-slider>
+    </div>
+
+  </div>
+
+  <!-- MULTIPLE ITEM -->
+  <div class="main-section single-item">
+    <h2 class="section-title">Multiple Item </h2>
+    <div class="slider-element">
+      <app-slider [sliderOptions]="multipleItemSliderOptions" [sliderItems]="multipleItemsSliderItems">
+        <ng-template #itemTemplate let-item>
+          <div class="text">{{ item.name }}</div>
+        </ng-template>
+      </app-slider>
+    </div>
+  </div>
+
+  <!-- RESPONSIVE DISPLAY -->
+  <div class="main-section single-item">
+    <h2 class="section-title">Responsive Display </h2>
+    <div class="slider-element">
+      <app-slider [sliderOptions]="responsiveDisplaySliderOptions" [sliderItems]="responsiveDisplaySliderItems"
+        [responsiveOptions]="responsiveOptions">
+        <ng-template #itemTemplate let-item>
+          <div class="text">{{ item.name }}</div>
+        </ng-template>
+      </app-slider>
+    </div>
+
+  </div>
+
+  <!-- AUTOPLAY -->
+  <div class="main-section single-item">
+    <h2 class="section-title">Autoplay </h2>
+    <div class="slider-element">
+      <app-slider [sliderOptions]="autoplaySliderOptions" [sliderItems]="autoplaySliderItems" [responsiveOptions]="responsiveOptions">
+        <ng-template #itemTemplate let-item>
+          <div class="text">{{ item.name }}</div>
+        </ng-template>
+      </app-slider>
+    </div>
+  </div>
+
+  <!-- INFINITE SCROLL -->
+  <div class="main-section single-item">
+    <h2 class="section-title">Infinite scroll </h2>
+    <div class="slider-element">
+      <app-slider [sliderOptions]="infiniteScrollSliderOptions" [sliderItems]="infiniteScrollSliderItems" [responsiveOptions]="responsiveOptions">
+        <ng-template #itemTemplate let-item>
+          <div class="text">{{ item.name }}</div>
+        </ng-template>
+      </app-slider>
+    </div>
+  </div>
+
+    <!-- MULTIPLE ROWS -->
+  <div class="main-section single-item">
+    <h2 class="section-title">Multiple Rows </h2>
+    <div class="slider-element">
+      <app-slider [sliderOptions]="multipleRowsSliderOptions" [sliderItems]="multipleRowsSliderItems" [responsiveOptions]="responsiveOptions">
+        <ng-template #itemTemplate let-item>
+          <div class="text">{{ item.name }}</div>
+        </ng-template>
+      </app-slider>
+    </div>
+  </div>
+
+
+  <!-- RIGHT TO LEFT -->
+  <div class="main-section single-item">
+    <h2 class="section-title">Right to Left</h2>
+    <div class="slider-element">
+      <app-slider [sliderOptions]="RTLSliderOptions" [sliderItems]="RTLSliderItems"
+        [responsiveOptions]="responsiveOptions">
+        <ng-template #itemTemplate let-item>
+          <div class="text">{{ item.name }}</div>
+        </ng-template>
+      </app-slider>
+    </div>
+  </div>
+
+
+</div>

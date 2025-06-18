@@ -1,0 +1,11 @@
+.navbar{
+    background-color: rgb(37, 37, 37);
+
+}
+.navbar .nav-link {
+  color: white !important;
+}
+
+.navbar .nav-link.active {
+  color: pink !important;
+}

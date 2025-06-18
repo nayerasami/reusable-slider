@@ -1,1 +1,16 @@
 /* You can add global styles to this file, and also import other style files */
+/* Global styles */
+* {
+
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Make sure html and body take full height */
+html, body {
+  height: 100%;
+  background-color: rgb(37, 37, 37);
+  color: white;
+}
+
