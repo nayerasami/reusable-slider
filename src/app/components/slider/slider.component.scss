@@ -1,8 +1,9 @@
 .slider {
+  position: relative;
   .slider-wrap {
     position: relative;
     overflow: hidden;
-    .slider-item {
+  .slider-item {
       height: 150px;
       background: pink;
       font-size: 26px;
@@ -17,6 +18,7 @@
       width: 100%;
     }
 
+  }
   .slider-nav {
     .prev,
     .next {
@@ -41,25 +43,27 @@
     .next {
       inset-inline-end: 20px;
     }
+    .disabled{
+      opacity: 0.5;
+      pointer-events: none;
+      cursor: not-allowed;
+    }
   }
-  }
-     .slider-indicators {
-      display: flex;
-      justify-content: center;
-      margin-top: 15px;
-      .indicator {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background-color: #ccc;
-        margin: 0 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        &.active {
-          background-color: #333;
-        }
+  .slider-indicators {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+    .indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #333;
+      margin: 0 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      &:not(.active) {
+        opacity: .4;
       }
     }
+  }
 }
-
-

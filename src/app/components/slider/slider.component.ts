@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, ContentChild, ElementRef, Input, OnInit, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ContentChild, ElementRef, HostListener, Input, OnInit, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { ResponsiveConfig, SliderOptions, CustomSliderItems, } from './interfaces/sliderTypes';
 import { DomSanitizer } from '@angular/platform-browser';
 import Hammer from 'hammerjs';
@@ -47,13 +47,25 @@ export class SliderComponent implements OnInit {
   isDraggable: boolean = true;
   isInfiniteScroll: boolean = false;
   maxArrayKey: any;
+  autoplay: boolean = false;
+  isExternalDrag = false;
+  shouldReInitializeHammer:boolean= false;
+  @HostListener('document:click', ['$event'])
+  onSelectStart(event: Event): void {
+     this.isDragging=false;
+     if(!this.isDragging && this.shouldReInitializeHammer){
+      this.initializeHammer()
+      this.shouldReInitializeHammer = false;
+     }
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['sliderItems'] || changes['sliderOptions']) {
       this.calculateSliderPosition();
       this.clonedSliderItems = [...this.sliderItems];
       this.stepSize = this.sliderOptions.stepSize;
       this.numberOfVisibleItems = this.sliderOptions.numberOfVisibleItems;
-      this.numberOfRows = this.sliderOptions.rows || 1;
+      this.numberOfRows = this.sliderOptions.rows ?? 1;
       this.spaceBetween = this.sliderOptions.spaceBetween ?? 12;
       this.isRTL = this.sliderOptions.rtl || false;
       this.animationSpeed = this.sliderOptions.animationSpeed ?? '0.6s';
@@ -62,7 +74,8 @@ export class SliderComponent implements OnInit {
       this.safePrevButton = this.sliderOptions.prevButton ? this.sanitizer.bypassSecurityTrustHtml(this.sliderOptions.prevButton) : '';
       this.isDraggable = this.sliderOptions.isDraggable ?? true;
       this.isInfiniteScroll = this.sliderOptions.infiniteScroll ?? false;
-      this.rowsArray = Array.from({ length: this.sliderOptions.rows }, (_, i) => i);
+      this.autoplay = this.sliderOptions.autoplay ?? false;
+      this.rowsArray = Array.from({ length: this.numberOfRows }, (_, i) => i);
       this.calculateIndicators();
       this.handleInfiniteScrollSliderItems();
       this.handleMoreThanOneRowSliderItems();
@@ -70,7 +83,8 @@ export class SliderComponent implements OnInit {
         this.currentIndex = 0;
         this.calculateSliderPosition();
       }
-      if (this.sliderOptions.autoplay) {
+
+      if (this.autoplay) {
         this.startAutoplay();
       }
     }
@@ -91,17 +105,19 @@ export class SliderComponent implements OnInit {
       } else {
         this.setDefaultSliderSettings();
       }
+
       this.calculateSliderPosition();
+
     }
   }
 
   handleMoreThanOneRowSliderItems() {
     if (this.numberOfRows > 1) {
-      for (let key = 0; key < this.sliderOptions.rows; key++) {
+      for (let key = 0; key < this.numberOfRows; key++) {
         this.customSliderItems[key] = [];
       }
-      for (let i = 0; i < this.sliderItems.length; i += this.sliderOptions.rows) {
-        for (let j = 0; j < this.sliderOptions.rows; j++) {
+      for (let i = 0; i < this.sliderItems.length; i += this.numberOfRows) {
+        for (let j = 0; j < this.numberOfRows; j++) {
           const item = this.sliderItems[i + j];
           if (item !== undefined) {
             this.customSliderItems[j].push(item);
@@ -132,9 +148,6 @@ export class SliderComponent implements OnInit {
 
     }
   }
-
-
-
   setDefaultSliderSettings(): void {
     if (this.sliderOptions) {
       this.numberOfVisibleItems = this.sliderOptions.numberOfVisibleItems || 4;
@@ -148,12 +161,12 @@ export class SliderComponent implements OnInit {
       const totalSlides = Math.ceil(originalLength / this.stepSize);
       this.indicatorsLength = totalSlides;
       this.indicatorsArray = Array.from({ length: this.indicatorsLength }, (_, i) => i);
-      this.maxCurrentIndex = originalLength - this.numberOfVisibleItems;
+      this.maxCurrentIndex = Math.ceil(originalLength - this.numberOfVisibleItems);
     } else {
       const totalSlides = (this.clonedSliderItems.length / this.numberOfRows - this.numberOfVisibleItems) / this.stepSize + 1;
       this.indicatorsLength = Math.ceil(totalSlides);
       this.indicatorsArray = Array.from({ length: this.indicatorsLength }, (_, i) => i);
-      this.maxCurrentIndex = (this.sliderItems.length - 1) / this.numberOfRows - (this.numberOfVisibleItems - this.stepSize);
+      this.maxCurrentIndex = Math.ceil((this.sliderItems.length - 1) / this.numberOfRows - (this.numberOfVisibleItems - this.stepSize));
     }
   }
   handleInfiniteOneRowSlider() {
@@ -204,11 +217,20 @@ export class SliderComponent implements OnInit {
     }
 
   }
+  isPrevDisabled(): boolean {
+    const boundry = this.isRTL ? this.indicatorsArray.length - 1 : 0
+    return !this.isInfiniteScroll && this.getCurrentIndicator() === boundry
+  }
 
+  isNextDisabled(): boolean {
+    const boundry = this.isRTL ? 0 : this.indicatorsArray.length - 1
+    return !this.isInfiniteScroll && this.getCurrentIndicator() === boundry
+  }
   ngOnInit(): void {
     window.addEventListener('resize', this.onWindowResize.bind(this));
 
   }
+
 
   ngAfterViewInit() {
     setTimeout(() => {
@@ -248,16 +270,17 @@ export class SliderComponent implements OnInit {
     );
     const width = window.innerWidth;
     const largestBreakpoint = this.sortedResponsiveOptons[this.sortedResponsiveOptons.length - 1].breakpoint.replace('px', '');
-    if (width > largestBreakpoint) {
+    if (width >= largestBreakpoint) {
       this.numberOfVisibleItems = this.sliderOptions.numberOfVisibleItems;
       this.stepSize = this.sliderOptions.stepSize;
+      this.currentIndex = this.isInfiniteScroll ? this.numberOfVisibleItems : 0;
     } else {
       let selectedConfig = null;
       for (let config of this.sortedResponsiveOptons) {
         const breakpoint = parseInt(config.breakpoint.replace('px', ''), 10);
         if (width > breakpoint) {
           selectedConfig = config;
-        } else if (width <= breakpoint) {
+        } else if (width < breakpoint) {
           selectedConfig = config;
           break;
         }
@@ -276,13 +299,11 @@ export class SliderComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-
   slideFinite(direction: 'forward' | 'backward'): void {
     const dir = this.isRTL ? -1 : 1;
     const movement = direction === 'forward' ? 1 : -1;
     const newIndex = this.currentIndex + dir * this.stepSize * movement;
-
-    if (newIndex >= 0 && newIndex <= this.maxCurrentIndex) {
+    if (newIndex >= 0 && newIndex <= Math.ceil(this.maxCurrentIndex)) {
       this.currentIndex = newIndex;
       this.calculateSliderPosition();
     }
@@ -308,7 +329,6 @@ export class SliderComponent implements OnInit {
       this.currentIndex = itemsPerRow + cloneCount - (cloneCount - this.currentIndex);
     }
   }
-
   slideInfinite(direction: 'forward' | 'backward'): void {
     const dir = this.isRTL ? -1 : 1;
     const movement = direction === 'forward' ? 1 : -1;
@@ -353,7 +373,7 @@ export class SliderComponent implements OnInit {
 
   getCurrentIndicator(): number {
     if (!this.isInfiniteScroll) {
-      return Math.floor(this.currentIndex / this.stepSize);
+      return Math.ceil(this.currentIndex / this.stepSize);
     }
     let normalizedIndex = this.currentIndex - this.numberOfVisibleItems;
     if (normalizedIndex < 0) {
@@ -367,6 +387,9 @@ export class SliderComponent implements OnInit {
 
   // drag
   private initializeHammer() {
+    if (this.hammer) {
+      this.hammer.destroy();
+    }
     let sliderElement: HTMLElement | null = null;
     if (this.rowSlider && this.rowSlider.nativeElement) {
       sliderElement = this.rowSlider.nativeElement;
@@ -375,45 +398,45 @@ export class SliderComponent implements OnInit {
       console.warn('Slider element not found');
       return;
     }
+
     this.hammer = new Hammer(sliderElement);
     this.hammer.get('pan').set({
       direction: Hammer.DIRECTION_HORIZONTAL,
       threshold: 10,
     });
-    this.hammer.on('panstart', (ev: any) => {
-      this.onDragStart(ev);
-    });
-    this.hammer.on('panmove', (ev: any) => {
-      this.onDragMove(ev);
-    });
-    this.hammer.on('panend', (ev: any) => {
-      this.onDragEnd(ev);
-    });
+    this.hammer.on('panstart', (ev: any) => { this.onDragStart(ev) });
+    this.hammer.on('panmove', (ev: any) => { this.onDragMove(ev) });
+    this.hammer.on('panend', (ev: any) => { this.onDragEnd(ev) });
+    this.hammer.on('pancancel', (ev: any) => this.onDragEnd(ev));
+
   }
 
   private onDragStart(event: any): void {
-    if (!this.isDraggable || this.sliderItems.length / this.numberOfRows <= this.numberOfVisibleItems) {
+    if (!this.isDraggable || (this.sliderItems.length / this.numberOfRows <= this.numberOfVisibleItems)) {
       this.isDragging = false;
       return;
     }
     this.isDragging = true;
     this.dragStartTranslateX = this.translateX;
-    if (this.sliderOptions.autoplay) {
+    if (this.autoplay) {
       this.stopAutoplay();
     }
     this.isTransitionEnabled = false;
+    this.shouldReInitializeHammer = true
   }
 
+
   private onDragMove(event: any): void {
-    if (!this.isDragging || !this.isDraggable || this.sliderItems.length / this.numberOfRows <= this.numberOfVisibleItems) return;
+    if (!this.isDragging || !this.isDraggable || (this.sliderItems.length / this.numberOfRows <= this.numberOfVisibleItems)) return;
     const containerWidth = this.rowSlider.nativeElement.offsetWidth;
     const dragPercentage = (event.deltaX / containerWidth) * 100;
     this.translateX = this.dragStartTranslateX + dragPercentage;
     this.cdr.detectChanges();
+    this.shouldReInitializeHammer =false;
   }
-
   private onDragEnd(event: any): void {
     if (!this.isDragging || !this.isDraggable || this.sliderItems.length / this.numberOfRows <= this.numberOfVisibleItems) return;
+    this.isDragging = false;
     this.isTransitionEnabled = true;
     const dragDistance = Math.abs(event.deltaX);
     // Check if drag distance exceeds threshold
@@ -456,17 +479,19 @@ export class SliderComponent implements OnInit {
     if (this.sliderOptions.autoplay) {
       this.startAutoplay();
     }
+
+
   }
   // autoplay
   startAutoplay(): void {
-    if (this.sliderOptions.autoplay) {
+    if (this.autoplay) {
       this.autoplayInterval = setInterval(() => {
         this.nextFunc();
       }, this.sliderOptions.autoplaySpeed || 3000); //default 3s
     }
   }
   stopAutoplay(): void {
-    if (this.autoplayInterval && this.sliderOptions.autoplay) {
+    if (this.autoplayInterval && this.autoplay) {
       clearInterval(this.autoplayInterval);
     }
   }
@@ -479,5 +504,6 @@ export class SliderComponent implements OnInit {
     if (this.hammer) {
       this.hammer.destroy();
     }
+
   }
 }
