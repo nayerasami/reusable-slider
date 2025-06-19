@@ -136,12 +136,11 @@ export class SliderComponent implements OnInit {
             maxArrayLength = this.clonedCustomSliderItems[key].length;
           }
         }
-        if (this.sliderItems.length % (this.numberOfVisibleItems * this.numberOfRows) !== 0) {
+        if (this.sliderItems.length % this.numberOfRows !== 0) {
           const virtualItemsArray = Array.from({ length: 1 }, () => ({ id: null, type: 'virtual' }));
           for (let key in this.clonedCustomSliderItems) {
             if (+key > +maxArrayKey) {
               this.clonedCustomSliderItems[key].push(...virtualItemsArray);
-              console.log(this.clonedCustomSliderItems)
             }
           }
         }

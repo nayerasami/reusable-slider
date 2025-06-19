@@ -185,7 +185,7 @@ export class DemosComponent {
     { id: 13, name: 'slide 13' },
     { id: 14, name: 'slide 14' },
     { id: 15, name: 'slide 15' },
-    { id: 16, name: 'slide 16' },
+  //  { id: 16, name: 'slide 16' },
   ];
 
   multipleRowsSliderOptions: SliderOptions = {
@@ -193,7 +193,7 @@ export class DemosComponent {
     autoplay: false,
     autoplaySpeed: 3000,
     indicators: true,
-    //infiniteScroll: true,
+    infiniteScroll: true,
     // isDraggable: false,
     numberOfVisibleItems: 3,
     stepSize: 2,
