@@ -73,6 +73,9 @@ export class SliderComponent implements OnInit {
       this.safeNextButton = this.sliderOptions.nextButton ? this.sanitizer.bypassSecurityTrustHtml(this.sliderOptions.nextButton) : '';
       this.safePrevButton = this.sliderOptions.prevButton ? this.sanitizer.bypassSecurityTrustHtml(this.sliderOptions.prevButton) : '';
       this.isDraggable = this.sliderOptions.isDraggable ?? true;
+      if ((this.sliderItems.length / this.numberOfRows <= this.numberOfVisibleItems)){
+        this.isDraggable = false;
+      }
       this.isInfiniteScroll = this.sliderOptions.infiniteScroll ?? false;
       this.autoplay = this.sliderOptions.autoplay ?? false;
       this.rowsArray = Array.from({ length: this.numberOfRows }, (_, i) => i);
