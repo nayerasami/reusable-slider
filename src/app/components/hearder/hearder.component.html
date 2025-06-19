@@ -6,9 +6,10 @@
     </button>
     <div class="collapse navbar-collapse justify-content-center" id="navbarNavAltMarkup">
       <div class="navbar-nav text-center">
-        <a class="nav-link active" aria-current="page" href="#">Demos</a>
-        <a class="nav-link" href="#">Usage</a>
-        <a class="nav-link" href="#">Settings</a>
+        <a class="nav-link active" [routerLink]="['/']" fragment="banner-section" [class.active]="router.url.includes('banner-section') ">Home</a>
+        <a class="nav-link active" [routerLink]="['/']" fragment="demos-section" [class.active]="router.url.includes('demos-section')">Demos</a>
+        <a class="nav-link" [routerLink]="['/']" fragment="usage-section" [class.active]="router.url.includes('usage-section')">Usage</a>
+        <a class="nav-link" [routerLink]="['/']" fragment="settings-section" [class.active]="router.url.includes('settings-section')">Settings</a>
       </div>
     </div>
   </div>
