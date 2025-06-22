@@ -69,8 +69,18 @@
 
   <!-- Indicators -->
   <div class="slider-indicators" *ngIf="sliderOptions.indicators && indicatorsArray.length > 1">
+    @if(customIndicators){
+    @for (item of indicatorsArray; track item; let i = $index) {
+    <div  >
+      <ng-container *ngTemplateOutlet="customIndicators; context: {$implicit: item, index: i}">
+      </ng-container>
+    </div>
+    }
+    }@else{
     @for (item of indicatorsArray; track item; let i = $index) {
     <div class="indicator" [class.active]="getCurrentIndicator() === i " (click)="goToSlide(i)"></div>
     }
+    }
+
   </div>
 </section>

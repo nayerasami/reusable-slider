@@ -22,6 +22,7 @@ export interface SliderOptions {
   nextButton?:string;
   prevButton?:string;
   rows:number;
+  customIndicators?:any;
 
 }
 

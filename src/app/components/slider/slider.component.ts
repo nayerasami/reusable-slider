@@ -50,6 +50,7 @@ export class SliderComponent implements OnInit {
   autoplay: boolean = false;
   isExternalDrag = false;
   shouldReInitializeHammer: boolean = false;
+  customIndicators:any;
   @HostListener('document:click', ['$event'])
   onSelectStart(event: Event): void {
     this.isDragging = false;
@@ -79,6 +80,8 @@ export class SliderComponent implements OnInit {
       this.isInfiniteScroll = this.sliderOptions.infiniteScroll ?? false;
       this.autoplay = this.sliderOptions.autoplay ?? false;
       this.rowsArray = Array.from({ length: this.numberOfRows }, (_, i) => i);
+      this.customIndicators = this.sliderOptions.customIndicators;
+      console.log(this.customIndicators,'cus')
       this.calculateIndicators();
       this.handleInfiniteScrollSliderItems();
       this.handleMoreThanOneRowSliderItems();
@@ -86,7 +89,6 @@ export class SliderComponent implements OnInit {
         this.currentIndex = 0;
         this.calculateSliderPosition();
       }
-
       if (this.autoplay) {
         this.startAutoplay();
       }

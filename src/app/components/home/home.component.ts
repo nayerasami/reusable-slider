@@ -1,5 +1,5 @@
 import { ResponsiveConfig, SliderOptions } from './../slider/interfaces/sliderTypes';
-import { Component } from '@angular/core';
+import { Component, TemplateRef, ViewChild, viewChild } from '@angular/core';
 import { SliderComponent } from '../slider/slider.component';
 import { CommonModule } from '@angular/common';
 
@@ -10,7 +10,15 @@ import { CommonModule } from '@angular/common';
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
+  @ViewChild('sliderEl') sliderEl !:HTMLElement;
+  @ViewChild('customIndicatorTemplate') customIndicatorTemplate!: TemplateRef<any>;
 
+  ngAfterViewInit():void{
+    this.sliderOptions ={
+      ...this.sliderOptions ,
+      customIndicators: this.customIndicatorTemplate
+    }
+  }
   responsiveOptions: ResponsiveConfig[] = [
     {
       breakpoint: '1400px',
@@ -47,7 +55,7 @@ export class HomeComponent {
     // rtl: true,
     animation: 'ease-in-out',
     animationSpeed: '0.8s',
-    rows: 2
+    rows: 2,
     // nextButton:'<div class="next">next</div>',
     // prevButton:'<div class="next">pre</div>'
   }
