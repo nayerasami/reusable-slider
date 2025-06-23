@@ -404,7 +404,6 @@ export class SliderComponent implements OnInit {
       return Math.floor(normalizedIndex / this.stepSize);
     }
   }
-
   // drag
   private initializeHammer() {
     if (this.hammer) {
@@ -464,17 +463,12 @@ export class SliderComponent implements OnInit {
     this.shouldReInitializeHammer = false;
   }
   private onDragEnd(event: HammerInput): void {
-    if (
-      !this.isDragging ||
-      !this.isDraggable ||
-      this.sliderItems.length / this.numberOfRows <= this.numberOfVisibleItems
-    ) {
+    if ( !this.isDragging ||!this.isDraggable || this.sliderItems.length / this.numberOfRows <= this.numberOfVisibleItems ) {
       return;
     }
 
     this.isDragging = false;
     this.isTransitionEnabled = true;
-
     const dragDistance = this.isVertical ? Math.abs(event.deltaY) : Math.abs(event.deltaX);
     if (dragDistance < this.dragThreshold) {
       this.calculateSliderPosition();

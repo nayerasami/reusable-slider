@@ -1,0 +1,50 @@
+.slider{
+    height: 400px;
+}
+/* .slider-item {
+  display: inline-block;
+  width: 394px;
+  height: 150px;
+  background: pink;
+  font-size: 26px;
+  font-weight: 600;
+  position: relative;
+  margin: 0 12px;
+} */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
+}
+.slider-wrap{
+  height: 400px;
+  width: 100vw;
+}
+.text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.custom-indicator {
+  width: 10px;
+  height: 10px;
+  margin: 5px 0;
+  border-radius: 50%;
+  background-color: #ccc;
+  cursor: pointer;
+  transition: background-color 0.3s ease;}
+
+.active-indicator {
+  width: 20px; /* Make it rectangular */
+  height: 10px;
+  border-radius: 5px; /* Optional: slightly rounded corners */
+  background-color: #ccc; /* Or any highlight color */
+
+}
+
+.slider-image{
+  object-fit: contain;
+  width: 100%;
+}

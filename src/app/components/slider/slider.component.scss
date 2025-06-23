@@ -1,6 +1,5 @@
 .slider {
   position: relative;
-
   .slider-wrap {
     position: relative;
     overflow: hidden;
@@ -18,7 +17,6 @@
 
     .slider-row {
       display: flex;
-      width: 100%;
     }
   }
   .slider-nav {
@@ -60,7 +58,7 @@
   .slider-indicators {
     display: flex;
     justify-content: center;
-
+    background-color: red;
     .indicator {
       width: 10px;
       height: 10px;
@@ -78,7 +76,9 @@
     .gallary-indicator {
       width: 80px;
       height: 80px;
-      border: 1px solid black;
+      &.active{
+      border: 2px solid white;
+      }
     }
   }
 

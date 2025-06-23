@@ -56,9 +56,12 @@ export class HomeComponent {
     animation: 'ease-in-out',
     animationSpeed: '0.8s',
     rows: 1,
-    //vertical:true,
+    vertical:true,
     gallaryImages:[
       'https://th.bing.com/th/id/OIP.EfEw_NSiPbpZgSM0vL-OUAHaGl?w=540&h=480&rs=1&pid=ImgDetMain&cb=idpwebp2&o=7&rm=3',
+      'https://wallpaperaccess.com/full/6265165.jpg',
+      'https://th.bing.com/th/id/OIP.0_yGb353J_SPSma7_uTmzQHaEK?rs=1&pid=ImgDetMain&cb=idpwebp2&o=7&rm=3',
+      'https://th.bing.com/th/id/R.d7faa569113256b2a90f51f9b80bc0c3?rik=IbuyyYfJZ%2fZTyA&riu=http%3a%2f%2f2.bp.blogspot.com%2f-OwWMk1CC2ok%2fUM2hsDN-nSI%2fAAAAAAAAEjQ%2fFp3dKry-lFU%2fs1600%2flatest%2blandscapes%2bhd%2bwallpapers.jpg&ehk=sGgoYBYOtEV3wveQ7wr0wqv6aNdBKcTahcVD6alzIZU%3d&risl=&pid=ImgRaw&r=0',
       'https://wallpaperaccess.com/full/6265165.jpg',
       'https://th.bing.com/th/id/OIP.0_yGb353J_SPSma7_uTmzQHaEK?rs=1&pid=ImgDetMain&cb=idpwebp2&o=7&rm=3',
       'https://th.bing.com/th/id/R.d7faa569113256b2a90f51f9b80bc0c3?rik=IbuyyYfJZ%2fZTyA&riu=http%3a%2f%2f2.bp.blogspot.com%2f-OwWMk1CC2ok%2fUM2hsDN-nSI%2fAAAAAAAAEjQ%2fFp3dKry-lFU%2fs1600%2flatest%2blandscapes%2bhd%2bwallpapers.jpg&ehk=sGgoYBYOtEV3wveQ7wr0wqv6aNdBKcTahcVD6alzIZU%3d&risl=&pid=ImgRaw&r=0'
@@ -67,12 +70,15 @@ export class HomeComponent {
     // prevButton:'<div class="next">pre</div>'
   }
 
-  sliderItems = [
+  sliderItems =[
       'https://th.bing.com/th/id/OIP.EfEw_NSiPbpZgSM0vL-OUAHaGl?w=540&h=480&rs=1&pid=ImgDetMain&cb=idpwebp2&o=7&rm=3',
       'https://wallpaperaccess.com/full/6265165.jpg',
       'https://th.bing.com/th/id/OIP.0_yGb353J_SPSma7_uTmzQHaEK?rs=1&pid=ImgDetMain&cb=idpwebp2&o=7&rm=3',
+      'https://th.bing.com/th/id/R.d7faa569113256b2a90f51f9b80bc0c3?rik=IbuyyYfJZ%2fZTyA&riu=http%3a%2f%2f2.bp.blogspot.com%2f-OwWMk1CC2ok%2fUM2hsDN-nSI%2fAAAAAAAAEjQ%2fFp3dKry-lFU%2fs1600%2flatest%2blandscapes%2bhd%2bwallpapers.jpg&ehk=sGgoYBYOtEV3wveQ7wr0wqv6aNdBKcTahcVD6alzIZU%3d&risl=&pid=ImgRaw&r=0',
+      'https://wallpaperaccess.com/full/6265165.jpg',
+      'https://th.bing.com/th/id/OIP.0_yGb353J_SPSma7_uTmzQHaEK?rs=1&pid=ImgDetMain&cb=idpwebp2&o=7&rm=3',
       'https://th.bing.com/th/id/R.d7faa569113256b2a90f51f9b80bc0c3?rik=IbuyyYfJZ%2fZTyA&riu=http%3a%2f%2f2.bp.blogspot.com%2f-OwWMk1CC2ok%2fUM2hsDN-nSI%2fAAAAAAAAEjQ%2fFp3dKry-lFU%2fs1600%2flatest%2blandscapes%2bhd%2bwallpapers.jpg&ehk=sGgoYBYOtEV3wveQ7wr0wqv6aNdBKcTahcVD6alzIZU%3d&risl=&pid=ImgRaw&r=0'
-   
+       
     // { id: 1, name: 'slide 1' },
     // { id: 2, name: 'slide 2' },
     // { id: 3, name: 'slide 3' },

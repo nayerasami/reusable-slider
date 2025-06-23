@@ -14,7 +14,10 @@
   box-sizing: border-box;
 
 }
-
+.slider-wrap{
+  height: 400px;
+  width: 100vw;
+}
 .text {
   position: absolute;
   top: 50%;
