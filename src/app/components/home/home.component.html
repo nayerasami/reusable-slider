@@ -1,11 +1,12 @@
+<div class="slider-section">
 <app-slider [sliderOptions]="sliderOptions" [responsiveOptions]="responsiveOptions" [sliderItems]="sliderItems"
   #sliderEl>
   <ng-template #itemTemplate let-item>
-    <div class="text">{{ item.name }}</div>
+    <img [src]="item" class="slider-image" alt="Gallery thumbnail"/>
+    <!-- <div class="text">{{ item.name }}</div> -->
     <ng-template #customIndicatorTemplate let-item let-index="index">
       <div class="custom-indicator" [class.active-indicator]="sliderEl.getCurrentIndicator() === index" (click)="sliderEl.goToSlide(index)"></div>
     </ng-template>
   </ng-template>
-
-
 </app-slider>
+</div>

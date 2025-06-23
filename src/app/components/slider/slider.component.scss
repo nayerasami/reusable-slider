@@ -1,10 +1,11 @@
 .slider {
   position: relative;
+
   .slider-wrap {
     position: relative;
     overflow: hidden;
-  .slider-item {
-      height: 150px;
+
+    .slider-item {
       background: #ffc0cb;
       font-size: 26px;
       font-weight: 600;
@@ -14,16 +15,18 @@
       margin: 0;
       border-radius: 15px;
     }
+
     .slider-row {
       display: flex;
       width: 100%;
     }
   }
   .slider-nav {
+
     .prev,
     .next {
       position: absolute;
-      top: 50%;
+      top: 0;
       transform: translateY(-50%);
       cursor: pointer;
       background: #ffffff;
@@ -33,37 +36,50 @@
       display: flex;
       align-items: center;
       justify-content: center;
+
       svg {
         fill: #333;
       }
     }
+
     .prev {
       inset-inline-start: 20px;
     }
+
     .next {
       inset-inline-end: 20px;
     }
-    .disabled{
+
+    .disabled {
       opacity: 0.5;
       pointer-events: none;
       cursor: not-allowed;
     }
   }
+
   .slider-indicators {
     display: flex;
     justify-content: center;
-    margin-top: 15px;
+
     .indicator {
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      background-color: white;
+      background-color: rgb(153, 153, 153);
       margin: 0 5px;
       cursor: pointer;
       transition: background-color 0.3s ease;
+
       &:not(.active) {
         opacity: .4;
       }
     }
+
+    .gallary-indicator {
+      width: 80px;
+      height: 80px;
+      border: 1px solid black;
+    }
   }
+
 }

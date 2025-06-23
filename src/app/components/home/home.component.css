@@ -24,7 +24,7 @@
 .custom-indicator {
   width: 10px;
   height: 10px;
-  margin: 0 5px;
+  margin: 5px 0;
   border-radius: 50%;
   background-color: #ccc;
   cursor: pointer;
@@ -36,4 +36,9 @@
   border-radius: 5px; /* Optional: slightly rounded corners */
   background-color: #ccc; /* Or any highlight color */
 
+}
+
+.slider-image{
+  object-fit: contain;
+  width: 100%;
 }

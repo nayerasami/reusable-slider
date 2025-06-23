@@ -1,25 +1,30 @@
-<section class="slider" [dir]="isRTL ? 'rtl' : 'ltr'" (select)="$event.preventDefault()">
-  <div class="slider-wrap" (mouseenter)="stopAutoplay()" (mouseleave)="startAutoplay()">
+<section class="slider d-flex" [ngStyle]="{'flex-direction': isVertical ? 'row' : 'column'}"
+  [dir]="isRTL ? 'rtl' : 'ltr'" (select)="$event.preventDefault()">
+  <div class="slider-wrap" [ngStyle]="{height: isVertical ? '400px' : 'auto',  }" (mouseenter)="stopAutoplay()"
+    (mouseleave)="startAutoplay()">
 
     <!-- gap: spaceBetween + 'px', -->
-    <div class="slider-main d-flex" [ngClass]="numberOfRows > 1 ? 'flex-column' : ''" #rowSlider [ngStyle]="{
-            transform: 'translateX(' + translateX + '%)',
+    <div class="slider-main d-flex" [ngClass]="numberOfRows > 1  || isVertical ? 'flex-column' : ''" #rowSlider
+      [ngStyle]="{
+            transform: isVertical? 'translateY(' + translateY + '%)':'translateX(' + translateX + '%)',
             transition: isTransitionEnabled ? ('transform ' + animationSpeed + ' ' + animation) : 'none',
             cursor: isDraggable ? (isDragging ? 'grabbing' : 'grab') : 'default',
-            gap: numberOfRows > 1 ? spaceBetween + 'px' : null
+            gap: (numberOfRows > 1 || isVertical)? spaceBetween + 'px' : null,
+            width: isVertical ? '1300px': '',
+            height: isVertical ?  '100%' : null
           }" [attr.data-draggable]="isDraggable">
-      @if(numberOfRows == 1) {
+      @if(numberOfRows == 1 ) {
       @for (item of sliderItems; track trackItemFun(item, $index);) {
-      <div class="slider-item" [ngStyle]="{
-              width: 'calc(' + (100 / numberOfVisibleItems) + '% - ' + spaceBetween + 'px)',
-              marginInline: spaceBetween / 2 + 'px',
-              'pointer-events': isDragging ? 'none' : 'auto'
+      <div class="slider-item" [ngStyle]="{width: isVertical ? '100%' : 'calc(' + (100 / numberOfVisibleItems) + '% - ' + spaceBetween + 'px)',
+                 height: isVertical ? 'calc(' + (100 / numberOfVisibleItems) + '% - ' + spaceBetween + 'px)' : '150px',   
+                 marginInline: spaceBetween / 2 + 'px',
+                 'pointer-events': isDragging ? 'none' : 'auto'
             }">
         <ng-container *ngTemplateOutlet="itemTemplate; context: {$implicit: item}"></ng-container>
       </div>
       }
       }
-      @else if(numberOfRows > 1) {
+      @else if(numberOfRows > 1 && !isVertical) {
       @for(row of rowsArray; track trackItemFun(row, $index);) {
       <div class="slider-row">
         @for (item of customSliderItems[row]; track trackItemFun(item, $index);) {
@@ -68,17 +73,34 @@
   </ng-container>
 
   <!-- Indicators -->
-  <div class="slider-indicators" *ngIf="sliderOptions.indicators && indicatorsArray.length > 1">
+  <div class="slider-indicators " *ngIf="sliderOptions.indicators && indicatorsArray.length > 1 "
+     [ngStyle]="{'flex-direction': isVertical ? 'column' : 'row',
+       'margin': isVertical ? '0 15px': '15px 0'}">
     @if(customIndicators){
     @for (item of indicatorsArray; track item; let i = $index) {
-    <div  >
+    <div >
       <ng-container *ngTemplateOutlet="customIndicators; context: {$implicit: item, index: i}">
       </ng-container>
     </div>
     }
+    }@else if(gallaryImages.length){
+       @for (item of gallaryImages; track item; let i = $index) {
+    <img 
+      class="gallary-indicator" 
+      [class.active]="getCurrentIndicator() === i" 
+      (click)="goToSlide(i)"
+      [src]="item" 
+      [ngStyle]="{
+        'margin': isVertical ? '5px 0' : '0 5px',
+      }"
+      alt="Gallery thumbnail"
+    >
+    }
     }@else{
     @for (item of indicatorsArray; track item; let i = $index) {
-    <div class="indicator" [class.active]="getCurrentIndicator() === i " (click)="goToSlide(i)"></div>
+    <div class="indicator" [class.active]="getCurrentIndicator() === i " (click)="goToSlide(i)"
+      [ngStyle]="{'margin': isVertical ? '5px 0' : '0 5px'}">
+    </div>
     }
     }
 

@@ -21,8 +21,10 @@ export interface SliderOptions {
   animationSpeed?:string;
   nextButton?:string;
   prevButton?:string;
-  rows:number;
+  rows?:number;
   customIndicators?:any;
+  vertical?:boolean,
+  gallaryImages?:any[];
 
 }
 

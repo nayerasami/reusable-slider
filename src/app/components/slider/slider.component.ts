@@ -26,6 +26,7 @@ export class SliderComponent implements OnInit {
   sortedResponsiveOptons: any;
   largestBreakpoint: any;
   translateX: number = 0;
+  translateY: number = 0;
   isRTL: boolean = false;
   animationSpeed: string = '0.6s';
   animation: string = 'linear';
@@ -43,6 +44,7 @@ export class SliderComponent implements OnInit {
   hammer?: HammerManager;
   isDragging: boolean = false;
   dragStartTranslateX: number = 0;
+  dragStartTranslateY: number = 0;
   dragThreshold: number = 50;
   isDraggable: boolean = true;
   isInfiniteScroll: boolean = false;
@@ -50,7 +52,9 @@ export class SliderComponent implements OnInit {
   autoplay: boolean = false;
   isExternalDrag = false;
   shouldReInitializeHammer: boolean = false;
-  customIndicators:any;
+  customIndicators: any;
+  isVertical: boolean = false;
+  gallaryImages:any;
   @HostListener('document:click', ['$event'])
   onSelectStart(event: Event): void {
     this.isDragging = false;
@@ -67,6 +71,10 @@ export class SliderComponent implements OnInit {
       this.stepSize = this.sliderOptions.stepSize;
       this.numberOfVisibleItems = this.sliderOptions.numberOfVisibleItems;
       this.numberOfRows = this.sliderOptions.rows ?? 1;
+      this.isVertical = this.sliderOptions.vertical ?? false;
+      if (this.isVertical && this.numberOfRows > 1) {
+        this.numberOfRows = 1;
+      }
       this.spaceBetween = this.sliderOptions.spaceBetween ?? 12;
       this.isRTL = this.sliderOptions.rtl || false;
       this.animationSpeed = this.sliderOptions.animationSpeed ?? '0.6s';
@@ -74,14 +82,14 @@ export class SliderComponent implements OnInit {
       this.safeNextButton = this.sliderOptions.nextButton ? this.sanitizer.bypassSecurityTrustHtml(this.sliderOptions.nextButton) : '';
       this.safePrevButton = this.sliderOptions.prevButton ? this.sanitizer.bypassSecurityTrustHtml(this.sliderOptions.prevButton) : '';
       this.isDraggable = this.sliderOptions.isDraggable ?? true;
-      if ((this.sliderItems.length / this.numberOfRows <= this.numberOfVisibleItems)){
+      if ((this.sliderItems.length / this.numberOfRows <= this.numberOfVisibleItems)) {
         this.isDraggable = false;
       }
       this.isInfiniteScroll = this.sliderOptions.infiniteScroll ?? false;
       this.autoplay = this.sliderOptions.autoplay ?? false;
       this.rowsArray = Array.from({ length: this.numberOfRows }, (_, i) => i);
       this.customIndicators = this.sliderOptions.customIndicators;
-      console.log(this.customIndicators,'cus')
+      this.gallaryImages = this.sliderOptions.gallaryImages ?? [];
       this.calculateIndicators();
       this.handleInfiniteScrollSliderItems();
       this.handleMoreThanOneRowSliderItems();
@@ -257,8 +265,13 @@ export class SliderComponent implements OnInit {
   }
 
   calculateSliderPosition() {
-    const itemWidth = 100 / this.numberOfVisibleItems;
-    this.translateX = this.isRTL ? (this.translateX = +(this.currentIndex * itemWidth)) : (this.translateX = -(this.currentIndex * itemWidth));
+    if (!this.isVertical) {
+      const itemWidth = 100 / this.numberOfVisibleItems;
+      this.translateX = this.isRTL ? (this.translateX = +(this.currentIndex * itemWidth)) : (this.translateX = -(this.currentIndex * itemWidth));
+    } else {
+      const itemHeight = 100 / this.numberOfVisibleItems;
+      this.translateY = -(this.currentIndex * itemHeight);
+    }
   }
 
   applyResponsiveOptions(): void {
@@ -424,7 +437,11 @@ export class SliderComponent implements OnInit {
       return;
     }
     this.isDragging = true;
-    this.dragStartTranslateX = this.translateX;
+    if (this.isVertical) {
+      this.dragStartTranslateY = this.translateY
+    } else {
+      this.dragStartTranslateX = this.translateX;
+    }
     if (this.autoplay) {
       this.stopAutoplay();
     }
@@ -435,50 +452,57 @@ export class SliderComponent implements OnInit {
 
   private onDragMove(event: any): void {
     if (!this.isDragging || !this.isDraggable || (this.sliderItems.length / this.numberOfRows <= this.numberOfVisibleItems)) return;
-    const containerWidth = this.rowSlider.nativeElement.offsetWidth;
-    const dragPercentage = (event.deltaX / containerWidth) * 100;
-    this.translateX = this.dragStartTranslateX + dragPercentage;
+    const containerSize = this.isVertical ? this.rowSlider.nativeElement.offsetHeight:this.rowSlider.nativeElement.offsetWidth;
+    const dragDirection = this.isVertical ? event.deltaY : event.deltaX;
+    const dragPercentage = (dragDirection / containerSize) *100
+    if (this.isVertical) {
+      this.translateY = this.dragStartTranslateY + dragPercentage;
+    } else {
+      this.translateX = this.dragStartTranslateX + dragPercentage;
+    }
     this.cdr.detectChanges();
     this.shouldReInitializeHammer = false;
   }
-  private onDragEnd(event: any): void {
-    if (!this.isDragging || !this.isDraggable || this.sliderItems.length / this.numberOfRows <= this.numberOfVisibleItems) return;
+  private onDragEnd(event: HammerInput): void {
+    if (
+      !this.isDragging ||
+      !this.isDraggable ||
+      this.sliderItems.length / this.numberOfRows <= this.numberOfVisibleItems
+    ) {
+      return;
+    }
+
     this.isDragging = false;
     this.isTransitionEnabled = true;
-    const dragDistance = Math.abs(event.deltaX);
-    // Check if drag distance exceeds threshold
+
+    const dragDistance = this.isVertical ? Math.abs(event.deltaY) : Math.abs(event.deltaX);
     if (dragDistance < this.dragThreshold) {
-      // Reset to original position if drag was too small
       this.calculateSliderPosition();
       if (this.sliderOptions.autoplay) {
         this.startAutoplay();
       }
       return;
     }
+
     let shouldMove = false;
+    const isNegativeDrag = this.isVertical ? event.deltaY < 0 : event.deltaX < 0;
+
     if (this.isInfiniteScroll) {
       shouldMove = true;
     } else {
-      if (event.deltaX < 0) {
-        shouldMove = this.isRTL ? this.currentIndex > 0 : this.currentIndex <= this.maxCurrentIndex - this.stepSize;
+      const canMoveForward = this.currentIndex <= this.maxCurrentIndex - this.stepSize;
+      const canMoveBackward = this.currentIndex > 0;
+
+      if (this.isRTL) {
+        shouldMove = isNegativeDrag ? canMoveBackward : canMoveForward;
       } else {
-        shouldMove = this.isRTL ? this.currentIndex <= this.maxCurrentIndex - this.stepSize : this.currentIndex > 0;
+        shouldMove = isNegativeDrag ? canMoveForward : canMoveBackward;
       }
     }
+
     if (shouldMove) {
-      if (this.isRTL) {
-        if (event.deltaX < 0) {
-          this.nextFunc();
-        } else {
-          this.prevFunc();
-        }
-      } else {
-        if (event.deltaX < 0) {
-          this.nextFunc();
-        } else {
-          this.prevFunc();
-        }
-      }
+      const goNext = this.isRTL ? !isNegativeDrag : isNegativeDrag;
+      goNext ? this.nextFunc() : this.prevFunc();
     } else {
       this.calculateSliderPosition();
     }
@@ -486,9 +510,56 @@ export class SliderComponent implements OnInit {
     if (this.sliderOptions.autoplay) {
       this.startAutoplay();
     }
-
-
   }
+
+  // private onDragEnd(event: any): void {
+  //   if (!this.isDragging || !this.isDraggable || this.sliderItems.length / this.numberOfRows <= this.numberOfVisibleItems) return;
+  //   this.isDragging = false;
+  //   this.isTransitionEnabled = true;
+  //   const dragDistance = Math.abs(event.deltaX);
+  //   // Check if drag distance exceeds threshold
+  //   if (dragDistance < this.dragThreshold) {
+  //     // Reset to original position if drag was too small
+  //     this.calculateSliderPosition();
+  //     if (this.sliderOptions.autoplay) {
+  //       this.startAutoplay();
+  //     }
+  //     return;
+  //   }
+  //   let shouldMove = false;
+  //   if (this.isInfiniteScroll) {
+  //     shouldMove = true;
+  //   } else {
+  //     if (event.deltaX < 0) {
+  //       shouldMove = this.isRTL ? this.currentIndex > 0 : this.currentIndex <= this.maxCurrentIndex - this.stepSize;
+  //     } else {
+  //       shouldMove = this.isRTL ? this.currentIndex <= this.maxCurrentIndex - this.stepSize : this.currentIndex > 0;
+  //     }
+  //   }
+  //   if (shouldMove) {
+  //     if (this.isRTL) {
+  //       if (event.deltaX < 0) {
+  //         this.nextFunc();
+  //       } else {
+  //         this.prevFunc();
+  //       }
+  //     } else {
+  //       if (event.deltaX < 0) {
+  //         this.nextFunc();
+  //       } else {
+  //         this.prevFunc();
+  //       }
+  //     }
+  //   } else {
+  //     this.calculateSliderPosition();
+  //   }
+
+  //   if (this.sliderOptions.autoplay) {
+  //     this.startAutoplay();
+  //   }
+
+
+  // }
   // autoplay
   startAutoplay(): void {
     if (this.autoplay) {
