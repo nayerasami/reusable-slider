@@ -24,7 +24,7 @@
     .prev,
     .next {
       position: absolute;
-      top: 0;
+      top:50%;
       transform: translateY(-50%);
       cursor: pointer;
       background: #ffffff;
@@ -34,7 +34,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-
       svg {
         fill: #333;
       }
@@ -57,7 +56,7 @@
 
   .slider-indicators {
     display: flex;
-    justify-content: center;
+    // justify-content: center;
     background-color: red;
     .indicator {
       width: 10px;
@@ -76,6 +75,7 @@
     .gallary-indicator {
       width: 80px;
       height: 80px;
+      object-fit: cover;
       &.active{
       border: 2px solid white;
       }

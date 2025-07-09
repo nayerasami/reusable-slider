@@ -54,7 +54,7 @@ export class SliderComponent implements OnInit {
   shouldReInitializeHammer: boolean = false;
   customIndicators: any;
   isVertical: boolean = false;
-  gallaryImages:any;
+  gallaryImages: any;
   @HostListener('document:click', ['$event'])
   onSelectStart(event: Event): void {
     this.isDragging = false;
@@ -75,7 +75,7 @@ export class SliderComponent implements OnInit {
       if (this.isVertical && this.numberOfRows > 1) {
         this.numberOfRows = 1;
       }
-      this.spaceBetween = this.sliderOptions.spaceBetween ?? 12;
+      this.spaceBetween = this.sliderOptions.spaceBetween ?? 0;
       this.isRTL = this.sliderOptions.rtl || false;
       this.animationSpeed = this.sliderOptions.animationSpeed ?? '0.6s';
       this.animation = this.sliderOptions.animation ?? 'linear';
@@ -451,9 +451,9 @@ export class SliderComponent implements OnInit {
 
   private onDragMove(event: any): void {
     if (!this.isDragging || !this.isDraggable || (this.sliderItems.length / this.numberOfRows <= this.numberOfVisibleItems)) return;
-    const containerSize = this.isVertical ? this.rowSlider.nativeElement.offsetHeight:this.rowSlider.nativeElement.offsetWidth;
+    const containerSize = this.isVertical ? this.rowSlider.nativeElement.offsetHeight : this.rowSlider.nativeElement.offsetWidth;
     const dragDirection = this.isVertical ? event.deltaY : event.deltaX;
-    const dragPercentage = (dragDirection / containerSize) *100
+    const dragPercentage = (dragDirection / containerSize) * 100
     if (this.isVertical) {
       this.translateY = this.dragStartTranslateY + dragPercentage;
     } else {
@@ -463,7 +463,7 @@ export class SliderComponent implements OnInit {
     this.shouldReInitializeHammer = false;
   }
   private onDragEnd(event: HammerInput): void {
-    if ( !this.isDragging ||!this.isDraggable || this.sliderItems.length / this.numberOfRows <= this.numberOfVisibleItems ) {
+    if (!this.isDragging || !this.isDraggable || this.sliderItems.length / this.numberOfRows <= this.numberOfVisibleItems) {
       return;
     }
 
