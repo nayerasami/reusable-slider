@@ -25,7 +25,7 @@ export interface SliderOptions {
   customIndicators?:any;
   vertical?:boolean,
   gallaryImages?:any[];
-
+  height?: string;
 }
 
 export interface CustomSliderItems {

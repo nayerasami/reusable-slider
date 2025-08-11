@@ -1,18 +1,55 @@
 .slider {
   position: relative;
+  &[slider-type="vertical"] {
+    .slider-nav {
+      svg {
+        transform: rotate(90deg);
+      }
+      .prev, .next {
+        inset-inline-end: 1.5rem;
+      }
+      .prev {
+        top: 0.5rem;
+      }
+      .next {
+        bottom: 0.5rem;
+      }
+    }
+    .slider-indicators {
+      min-width: 80px;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+  }
+  &[slider-type="horizontal"] {
+    .slider-nav {
+      .prev, .next {
+        top:50%;
+        transform: translateY(-50%);
+      }
+      .prev {
+        inset-inline-start: 20px;
+      }
+      .next {
+        inset-inline-end: 20px;
+      }
+    }
+    .slider-indicators {
+      min-height: max-content;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+  }
+
   .slider-wrap {
     position: relative;
     overflow: hidden;
 
     .slider-item {
-      background: #ffc0cb;
-      font-size: 26px;
-      font-weight: 600;
-      position: relative;
       flex: 0 0 auto;
-      box-sizing: border-box;
       margin: 0;
-      border-radius: 15px;
     }
 
     .slider-row {
@@ -20,12 +57,9 @@
     }
   }
   .slider-nav {
-
     .prev,
     .next {
       position: absolute;
-      top:50%;
-      transform: translateY(-50%);
       cursor: pointer;
       background: #ffffff;
       border-radius: 50%;
@@ -39,14 +73,6 @@
       }
     }
 
-    .prev {
-      inset-inline-start: 20px;
-    }
-
-    .next {
-      inset-inline-end: 20px;
-    }
-
     .disabled {
       opacity: 0.5;
       pointer-events: none;
@@ -57,13 +83,12 @@
   .slider-indicators {
     display: flex;
     // justify-content: center;
-    background-color: red;
     .indicator {
       width: 10px;
       height: 10px;
       border-radius: 50%;
       background-color: rgb(153, 153, 153);
-      margin: 0 5px;
+      // margin: 0 5px;
       cursor: pointer;
       transition: background-color 0.3s ease;
 
@@ -73,11 +98,16 @@
     }
 
     .gallary-indicator {
-      width: 80px;
-      height: 80px;
-      object-fit: cover;
+      min-width: 80px;
+      height: 55px;
+      cursor: pointer;
       &.active{
-      border: 2px solid white;
+        border: 2px solid #838383;
+      }
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
     }
   }

@@ -1,20 +1,20 @@
 
 <h1>SLIDER APP</h1>
 
-<div class="container-fluid">
-    <div class="row "  style="height: 400px;">
-        <div class="col-md-12 slider">
-<app-slider [sliderOptions]="sliderOptions" [responsiveOptions]="responsiveOptions" [sliderItems]="sliderItems"
-  #sliderEl>
-  <ng-template #itemTemplate let-item>
-    <img [src]="item" class="slider-image" alt="Gallery thumbnail"/>
-    <!-- <div class="text">{{ item.name }}</div> -->
-    <ng-template #customIndicatorTemplate let-item let-index="index">
-      <div class="custom-indicator" [class.active-indicator]="sliderEl.getCurrentIndicator() === index" (click)="sliderEl.goToSlide(index)"></div>
-    </ng-template>
-  </ng-template>
-</app-slider>
-        </div>
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 slider">
+      <app-slider [sliderOptions]="sliderOptions" [responsiveOptions]="responsiveOptions" [sliderItems]="sliderItems"
+        #sliderEl>
+        <ng-template #itemTemplate let-item>
+          <img [src]="item" class="slider-image" alt="Gallery thumbnail"/>
+          <!-- <div class="text">{{ item.name }}</div> -->
+          <ng-template #customIndicatorTemplate let-item let-index="index">
+            <div class="custom-indicator" [class.active-indicator]="sliderEl.getCurrentIndicator() === index" (click)="sliderEl.goToSlide(index)"></div>
+          </ng-template>
+        </ng-template>
+      </app-slider>
     </div>
+  </div>
 </div>
 <router-outlet />

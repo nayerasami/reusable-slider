@@ -55,6 +55,7 @@ export class SliderComponent implements OnInit {
   customIndicators: any;
   isVertical: boolean = false;
   gallaryImages: any;
+  height: string = '300px';
   @HostListener('document:click', ['$event'])
   onSelectStart(event: Event): void {
     this.isDragging = false;
@@ -90,6 +91,7 @@ export class SliderComponent implements OnInit {
       this.rowsArray = Array.from({ length: this.numberOfRows }, (_, i) => i);
       this.customIndicators = this.sliderOptions.customIndicators;
       this.gallaryImages = this.sliderOptions.gallaryImages ?? [];
+      this.height = this.sliderOptions.height;
       this.calculateIndicators();
       this.handleInfiniteScrollSliderItems();
       this.handleMoreThanOneRowSliderItems();
@@ -270,7 +272,7 @@ export class SliderComponent implements OnInit {
       this.translateX = this.isRTL ? (this.translateX = +(this.currentIndex * itemWidth)) : (this.translateX = -(this.currentIndex * itemWidth));
     } else {
       const itemHeight = 100 / this.numberOfVisibleItems;
-      this.translateY = -(this.currentIndex * itemHeight);
+      this.translateY = -((this.currentIndex * itemHeight));
     }
   }
 
