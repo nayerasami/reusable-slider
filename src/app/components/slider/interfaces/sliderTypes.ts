@@ -24,12 +24,7 @@ export interface SliderOptions {
   rows?:number;
   customIndicators?:any;
   vertical?:boolean,
-  gallaryImages?:any[];
+  galleryImages?:any[];
   height?: string;
 }
 
-export interface CustomSliderItems {
-  upper?: any;
-  middle?:any;
-  lower?: any;
-}

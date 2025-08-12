@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, ContentChild, ElementRef, HostListener, Input, OnInit, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
-import { ResponsiveConfig, SliderOptions, CustomSliderItems, } from './interfaces/sliderTypes';
+import { ChangeDetectorRef, Component, ContentChild, ElementRef, HostListener, Input, OnInit, QueryList, SimpleChanges, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
+import { ResponsiveConfig, SliderOptions } from './interfaces/sliderTypes';
 import { DomSanitizer } from '@angular/platform-browser';
 import Hammer from 'hammerjs';
 @Component({
@@ -14,6 +14,7 @@ export class SliderComponent implements OnInit {
   constructor(private cdr: ChangeDetectorRef, private sanitizer: DomSanitizer) { }
   @ContentChild('itemTemplate') itemTemplate!: TemplateRef<any>;
   @ViewChild('rowSlider', { static: false }) rowSlider!: ElementRef;
+  @ViewChildren('galleryImage') galleryImagesIndicators!: QueryList<ElementRef>;
   @Input() responsiveOptions: any;
   @Input() sliderOptions: any;
   @Input() sliderItems: any[] = [];
@@ -54,7 +55,7 @@ export class SliderComponent implements OnInit {
   shouldReInitializeHammer: boolean = false;
   customIndicators: any;
   isVertical: boolean = false;
-  gallaryImages: any;
+  galleryImages: any;
   height: string = '300px';
   @HostListener('document:click', ['$event'])
   onSelectStart(event: Event): void {
@@ -90,7 +91,7 @@ export class SliderComponent implements OnInit {
       this.autoplay = this.sliderOptions.autoplay ?? false;
       this.rowsArray = Array.from({ length: this.numberOfRows }, (_, i) => i);
       this.customIndicators = this.sliderOptions.customIndicators;
-      this.gallaryImages = this.sliderOptions.gallaryImages ?? [];
+      this.galleryImages = this.sliderOptions.galleryImages ?? [];
       this.height = this.sliderOptions.height;
       this.calculateIndicators();
       this.handleInfiniteScrollSliderItems();
@@ -245,14 +246,23 @@ export class SliderComponent implements OnInit {
     window.addEventListener('resize', this.onWindowResize.bind(this));
 
   }
-
-
   ngAfterViewInit() {
+
+
     setTimeout(() => {
       this.initializeHammer();
     }, 0);
   }
-
+  setActive(index: number) {
+    this.currentIndex = index;
+      const activeEl = this.galleryImagesIndicators.toArray()[index]?.nativeElement;
+      activeEl?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      if(index > this.maxCurrentIndex+1){
+        index = 0;
+        const activeEl = this.galleryImagesIndicators.toArray()[index]?.nativeElement;
+        activeEl?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
   onWindowResize = () => {
     clearTimeout(this.resizeTimeout);
     this.resizeTimeout = setTimeout(() => {
@@ -342,7 +352,7 @@ export class SliderComponent implements OnInit {
     if (this.sliderItems.length / this.numberOfRows < this.numberOfVisibleItems) return;
     const cloneCount = Math.max(this.numberOfVisibleItems, this.stepSize);
     const itemsPerRow = this.clonedCustomSliderItems[0].length;
-    const totalItemsPerRow = itemsPerRow + 2 * cloneCount; // Including clones
+    const totalItemsPerRow = itemsPerRow + 2 * cloneCount;
     if (this.currentIndex >= totalItemsPerRow - this.numberOfVisibleItems) {
       this.currentIndex = cloneCount + (this.currentIndex - (itemsPerRow + cloneCount));
     } else if (this.currentIndex < cloneCount) {
@@ -374,6 +384,8 @@ export class SliderComponent implements OnInit {
     } else {
       this.slideFinite('forward');
     }
+    this.setActive(this.currentIndex)
+
   }
 
   prevFunc(): void {
@@ -382,6 +394,8 @@ export class SliderComponent implements OnInit {
     } else {
       this.slideFinite('backward');
     }
+    this.setActive(this.currentIndex)
+
   }
 
   // indicators
@@ -389,6 +403,7 @@ export class SliderComponent implements OnInit {
     this.currentIndex = this.isInfiniteScroll ? this.numberOfVisibleItems + index * this.stepSize : Math.min(index * this.stepSize, this.maxCurrentIndex);
     this.isTransitionEnabled = true;
     this.calculateSliderPosition();
+    this.setActive(index);
   }
 
   getCurrentIndicator(): number {
@@ -508,54 +523,7 @@ export class SliderComponent implements OnInit {
     }
   }
 
-  // private onDragEnd(event: any): void {
-  //   if (!this.isDragging || !this.isDraggable || this.sliderItems.length / this.numberOfRows <= this.numberOfVisibleItems) return;
-  //   this.isDragging = false;
-  //   this.isTransitionEnabled = true;
-  //   const dragDistance = Math.abs(event.deltaX);
-  //   // Check if drag distance exceeds threshold
-  //   if (dragDistance < this.dragThreshold) {
-  //     // Reset to original position if drag was too small
-  //     this.calculateSliderPosition();
-  //     if (this.sliderOptions.autoplay) {
-  //       this.startAutoplay();
-  //     }
-  //     return;
-  //   }
-  //   let shouldMove = false;
-  //   if (this.isInfiniteScroll) {
-  //     shouldMove = true;
-  //   } else {
-  //     if (event.deltaX < 0) {
-  //       shouldMove = this.isRTL ? this.currentIndex > 0 : this.currentIndex <= this.maxCurrentIndex - this.stepSize;
-  //     } else {
-  //       shouldMove = this.isRTL ? this.currentIndex <= this.maxCurrentIndex - this.stepSize : this.currentIndex > 0;
-  //     }
-  //   }
-  //   if (shouldMove) {
-  //     if (this.isRTL) {
-  //       if (event.deltaX < 0) {
-  //         this.nextFunc();
-  //       } else {
-  //         this.prevFunc();
-  //       }
-  //     } else {
-  //       if (event.deltaX < 0) {
-  //         this.nextFunc();
-  //       } else {
-  //         this.prevFunc();
-  //       }
-  //     }
-  //   } else {
-  //     this.calculateSliderPosition();
-  //   }
 
-  //   if (this.sliderOptions.autoplay) {
-  //     this.startAutoplay();
-  //   }
-
-
-  // }
   // autoplay
   startAutoplay(): void {
     if (this.autoplay) {

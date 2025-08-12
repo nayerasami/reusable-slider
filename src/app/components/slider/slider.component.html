@@ -1,7 +1,6 @@
-<section class="slider d-flex" [attr.slider-type]="isVertical ? 'vertical' : 'horizontal'" [ngStyle]="{ 'flex-direction': isVertical ? 'row' : 'column' , height, gap: isVertical || gallaryImages.length ? '0.8rem' : '' }"
+<section class="slider d-flex" [attr.slider-type]="isVertical ? 'vertical' : 'horizontal'" [ngStyle]="{ 'flex-direction': isVertical ? 'row' : 'column' , height, gap: isVertical || galleryImages.length ? '0.8rem' : '' }"
   [dir]="isRTL ? 'rtl' : 'ltr'" (select)="$event.preventDefault()">
-  <div class="slider-wrap" [class.flex-grow-1]="gallaryImages.length" (mouseenter)="stopAutoplay()"
-    (mouseleave)="startAutoplay()">
+  <div class="slider-wrap" [class.flex-grow-1]="galleryImages.length" (mouseenter)="stopAutoplay()" (mouseleave)="startAutoplay()">
     <!-- gap: spaceBetween + 'px', -->
     <div class="slider-main d-flex"  [ngClass]="numberOfRows > 1 || isVertical ? 'flex-column' : ''" #rowSlider
       [ngStyle]="{
@@ -10,7 +9,7 @@
         cursor: isDraggable ? (isDragging ? 'grabbing' : 'grab') : 'default',
         gap: numberOfRows > 1 || isVertical ? spaceBetween + 'px' : null,
         width: '100%',
-        height: '100%' 
+        height: '100%'
       }" [attr.data-draggable]="isDraggable">
       @if(numberOfRows == 1 ) {
       @for (item of sliderItems; track trackItemFun(item, $index);) {
@@ -23,14 +22,10 @@
         <ng-container *ngTemplateOutlet="itemTemplate; context: { $implicit: item }"></ng-container>
       </div>
       }
-      } @else if(numberOfRows > 1 && !isVertical) { @for(row of rowsArray;
-      track trackItemFun(row, $index);) {
+      } @else if(numberOfRows > 1 && !isVertical) { @for(row of rowsArray; track trackItemFun(row, $index);) {
       <div class="slider-row">
-        @for (item of customSliderItems[row]; track trackItemFun(item, $index);)
-        {
-        <div class="slider-item"
-          [ngStyle]="{ width: 'calc(' + 100 / numberOfVisibleItems +'% - ' +spaceBetween + 'px)', marginInline: spaceBetween / 2 + 'px'}"
-          [style.visibility]="item.type === 'virtual' ? 'hidden' : 'visible'">
+        @for (item of customSliderItems[row]; track trackItemFun(item, $index);) {
+        <div class="slider-item" [ngStyle]="{ width: 'calc(' + 100 / numberOfVisibleItems +'% - ' +spaceBetween + 'px)', marginInline: spaceBetween / 2 + 'px'}" [style.visibility]="item.type === 'virtual' ? 'hidden' : 'visible'">
           <ng-container *ngTemplateOutlet="itemTemplate; context: { $implicit: item }"></ng-container>
         </div>
         }
@@ -44,61 +39,53 @@
   <ng-container
     *ngIf=" sliderOptions.navButtons &&(isInfiniteScroll || (!isInfiniteScroll && clonedSliderItems.length / numberOfRows > numberOfVisibleItems))">
     <div class="slider-nav">
-      <button role="button" [ngClass]="[ isRTL ? 'next' : 'prev', isPrevDisabled() ? 'disabled' : '']"
-        (click)="prevFunc()" *ngIf="!sliderOptions.prevButton; else customPrev">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left"
-          viewBox="0 0 16 16">
-          <path fill-rule="evenodd"
-            d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
+      <button role="button" [ngClass]="[ isRTL ? 'next' : 'prev', isPrevDisabled() ? 'disabled' : '']" (click)="prevFunc()" *ngIf="!sliderOptions.prevButton; else customPrev">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+          <path fill-rule="evenodd"  d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
         </svg>
       </button>
-      <button role="button" [ngClass]="[ isRTL ? 'prev' : 'next',  isNextDisabled() ? 'disabled' : '']"
-        (click)="nextFunc()" *ngIf="!sliderOptions.nextButton; else customNext">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right"
-          viewBox="0 0 16 16">
-          <path fill-rule="evenodd"
-            d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708" />
+      <button role="button" [ngClass]="[ isRTL ? 'prev' : 'next',  isNextDisabled() ? 'disabled' : '']" (click)="nextFunc()" *ngIf="!sliderOptions.nextButton; else customNext">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708" />
         </svg>
       </button>
 
       <ng-template #customPrev>
-        <button role="button" [ngClass]="[isRTL ? 'next' : 'prev', isPrevDisabled() ? 'disabled' : '' ]"
-          [innerHtml]="isRTL ? safeNextButton : safePrevButton" (click)="prevFunc()"></button>
+        <button role="button" [ngClass]="[isRTL ? 'next' : 'prev', isPrevDisabled() ? 'disabled' : '' ]" [innerHtml]="isRTL ? safeNextButton : safePrevButton" (click)="prevFunc()"></button>
       </ng-template>
       <ng-template #customNext>
-        <button role="button" [ngClass]="[ isRTL ? 'prev' : 'next',isNextDisabled() ? 'disabled' : '' ]"
-          [innerHtml]="isRTL ? safePrevButton : safeNextButton" (click)="nextFunc()"></button>
+        <button role="button" [ngClass]="[ isRTL ? 'prev' : 'next',isNextDisabled() ? 'disabled' : '' ]" [innerHtml]="isRTL ? safePrevButton : safeNextButton" (click)="nextFunc()"></button>
       </ng-template>
     </div>
   </ng-container>
 
   <!-- Indicators -->
   <div class="slider-indicators" *ngIf="sliderOptions.indicators && indicatorsArray.length > 1" [ngStyle]="{
-      'margin': gallaryImages.length ? '' : '15px 0',
+      'margin': galleryImages.length ? '' : '15px 0',
       'overflow-y': 'auto',
       'flex-wrap': 'nowrap',
       'align-items': isVertical ? 'flex-start' : '',
       'gap': '10px',
-      'justify-content': gallaryImages.length ? 'flex-start' : 'center',
+      'justify-content': galleryImages.length ? 'flex-start' : 'center',
     }">
-    @if(customIndicators){ 
-      @for (item of indicatorsArray; track item; let i =$index) {
+    @if(customIndicators){
+      @for (item of indicatorsArray; track trackItemFun(item, $index); let i =$index) {
         <div>
           <ng-container *ngTemplateOutlet="customIndicators; context: { $implicit: item, index: i }"></ng-container>
         </div>
-      } 
+      }
     }
-    @else if(gallaryImages.length){ 
-      <div class="d-flex gap-2 mx-auto" [ngStyle]="{'flex-direction': isVertical ? 'column' : 'row'}">
-      @for (item of gallaryImages ; track item ; let i = $index) {
-        <div class="gallary-indicator" [class.active]="getCurrentIndicator() === i">
-          <img (click)="goToSlide(i)" [src]="item" alt="Gallery thumbnail" />
+    @else if(galleryImages.length){
+      <div class="d-flex gap-2 mx-auto" [ngStyle]="{'flex-direction': isVertical ? 'column' : 'row'}"  #galleryContainer>
+      @for (item of galleryImages ; track trackItemFun(item, $index); let i = $index) {
+        <div class="gallary-indicator" [class.active]="getCurrentIndicator() === i" #galleryImage>
+          <img (click)="goToSlide(i)"  [class.active]="getCurrentIndicator() === i" [src]="item" alt="Gallery thumbnail" />
         </div>
       }
     </div>
     }
-    @else{ 
-      @for (item of indicatorsArray; track item; let i = $index) {
+    @else{
+      @for (item of indicatorsArray; track trackItemFun(item, $index); let i = $index) {
         <div class="indicator" [class.active]="getCurrentIndicator() === i" (click)="goToSlide(i)"></div>
       }
     }
