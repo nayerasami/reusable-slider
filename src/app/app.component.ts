@@ -7,7 +7,7 @@ import { ResponsiveConfig, SliderOptions } from './components/slider/interfaces/
   selector: 'app-root',
   imports: [RouterOutlet ,SliderComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrl: './app.component.scss'
 })
 export class AppComponent {
   title = 'reusable-slider';
@@ -57,7 +57,7 @@ export class AppComponent {
     animation: 'ease-in-out',
     animationSpeed: '0.8s',
     rows: 1,
-    height: '510px',
+    //height: '220px',
    // vertical: true,
     galleryImages:[
       'https://doodleipsum.com/3000x2000/flat?bg=D98D63&i=4f0a73f37c3672bcf5c214b62b690ba4',

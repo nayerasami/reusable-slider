@@ -56,7 +56,7 @@ export class SliderComponent implements OnInit {
   customIndicators: any;
   isVertical: boolean = false;
   galleryImages: any;
-  height: string = '300px';
+  height!: string;
   @HostListener('document:click', ['$event'])
   onSelectStart(event: Event): void {
     this.isDragging = false;
@@ -92,7 +92,7 @@ export class SliderComponent implements OnInit {
       this.rowsArray = Array.from({ length: this.numberOfRows }, (_, i) => i);
       this.customIndicators = this.sliderOptions.customIndicators;
       this.galleryImages = this.sliderOptions.galleryImages ?? [];
-      this.height = this.sliderOptions.height;
+      this.height = this.sliderOptions.height ?? '300px';
       this.calculateIndicators();
       this.handleInfiniteScrollSliderItems();
       this.handleMoreThanOneRowSliderItems();
