@@ -1,6 +1,6 @@
 <section class="slider d-flex" [attr.slider-type]="isVertical ? 'vertical' : 'horizontal'" [ngStyle]="{ 'flex-direction': isVertical ? 'row' : 'column' , height, gap: isVertical || galleryImages.length ? '0.8rem' : '' }"
   [dir]="isRTL ? 'rtl' : 'ltr'" (select)="$event.preventDefault()">
-  <div class="slider-wrap" [class.flex-grow-1]="galleryImages.length" (mouseenter)="stopAutoplay()" (mouseleave)="startAutoplay()">
+  <div class="slider-wrap" [class.flex-grow-1]="galleryImages.length || isVertical" (mouseenter)="stopAutoplay()" (mouseleave)="startAutoplay()">
     <!-- gap: spaceBetween + 'px', -->
     <div class="slider-main d-flex"  [ngClass]="numberOfRows > 1 || isVertical ? 'flex-column' : ''" #rowSlider
       [ngStyle]="{
@@ -65,6 +65,7 @@
       'overflow-y': 'auto',
       'flex-wrap': 'nowrap',
       'align-items': isVertical ? 'flex-start' : '',
+      'flex-direction': isVertical ? 'column' : '',
       'gap': '10px',
       'justify-content': galleryImages.length ? 'flex-start' : 'center',
     }">
